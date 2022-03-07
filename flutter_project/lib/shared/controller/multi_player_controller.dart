@@ -8,9 +8,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:two_square_game/shared/controller/multi_player/create_room_controller.dart';
 import 'package:two_square_game/shared/controller/multi_player/join_room_controller.dart';
 import 'package:two_square_game/shared/network/dio_network.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../screens/menu.dart';
-import '../components.dart/push_page.dart';
 import '../states/muli_player_states.dart';
 
 class MultiPlayerController extends Cubit<MultiPlyerStates>
@@ -18,7 +18,7 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
   MultiPlayerController() : super(MultiPlyerInitialState());
   static MultiPlayerController get(BuildContext context) =>
       BlocProvider.of(context);
-  static BuildContext? context;
+  static late BuildContext context;
 
   late List<dynamic> board;
   late int _player;
@@ -27,44 +27,64 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
   late int _turn;
   int turn() => _turn;
 
-  late int _idRoom;
-  int idRoom() => _idRoom;
+  int? _idRoom;
+  int? idRoom() => _idRoom;
 
   int? playerWin;
 
   int? _number1, _number2;
   int? number1() => _number1;
   void makeOrJoinRoom(int boardSize) async {
-    emit(WaitingPlayer());
-    var response =
-        await DioHelper.postData(url: "controller/control_room.php", query: {
-      "boardSize": boardSize,
-    });
-    var data = response.data;
-    Map<String, String>? serverData;
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
-    if (data['messages'][0] == "Room Created") {
-      serverData = super.createRoom(data['data']);
-    } else {
-      serverData = super.joinRoom(data['data']);
-    }
-    if (serverData != null) {
-      board = jsonDecode(serverData['board']!);
-      _player = int.parse(serverData['player']!);
-      _idRoom = int.parse(serverData['id']!);
-      _turn = 1;
+    try {
+      emit(WaitingPlayer());
+      var response =
+          await DioHelper.postData(url: "controller/control_room.php", query: {
+        "gameVersion": packageInfo.buildNumber,
+        "boardSize": boardSize,
+      });
+      var data = response.data;
+      String message = data['messages'][0];
+      Map<String, String>? serverData;
 
-      await FirebaseMessaging.instance.subscribeToTopic("room_$_idRoom");
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      if (data['messages'][0] == "Room Created") {
+      if (message.contains("Please Update Game First")) {
+        log(message);
+        emit(UpdateGameAlert());
         return;
+      } else if (message == "Room Created") {
+        serverData = super.createRoom(data['data']);
+      } else {
+        serverData = super.joinRoom(data['data']);
       }
-      Map sendData = {"message": "joined"};
+      if (serverData != null) {
+        board = jsonDecode(serverData['board']!);
+        _player = int.parse(serverData['player']!);
+        _idRoom = int.parse(serverData['id']!);
+        _turn = 1;
 
-      await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
-    } else {
-      emit(ServerError());
+        await FirebaseMessaging.instance.subscribeToTopic("room_$_idRoom");
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        if (data['messages'][0] == "Room Created") {
+          return;
+        }
+        Map sendData = {"message": "joined"};
+
+        await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
+      } else {
+        emit(ServerError());
+      }
+    } catch (ex) {
+      BotToast.showText(text: "Server Error");
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => const Menu(),
+        ),
+        (route) => false,
+      );
+      log(packageInfo.buildNumber.toString());
     }
   }
 
@@ -126,6 +146,7 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
       endGame(_player);
       emit(EndGame());
     } else {
+      emit(ServerError());
       logout();
     }
     BotToast.closeAllLoading();
@@ -154,18 +175,26 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
   }
 
   void logout() async {
-    await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
-    Map sendData = {};
-    if (_player == 1) {
-      sendData = {"message": "player win 2"};
-    } else {
-      sendData = {"message": "player win 1"};
-    }
+    if (_idRoom != null) {
+      Map sendData = {};
+      if (_player == 1) {
+        sendData = {"message": "player win 2"};
+      } else {
+        sendData = {"message": "player win 1"};
+      }
 
-    await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
-    pushReplacementAll(
-      context: context!,
-      widget: const Menu(),
+      await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
+      await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
+
+      await DioHelper.postData(
+          url: "delete/room_delete.php", query: {"roomId": _idRoom});
+    }
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => const Menu(),
+      ),
+      (route) => false,
     );
   }
 

@@ -38,6 +38,28 @@ if (!$jsonData = json_decode($rowPostData)) {
     $response->send();
     exit;
 }
+if(!isset($jsonData->gameVersion)){
+    $response = new Response();
+    $response->setHttpStatusCode(400);
+    $response->setSuccess(false);
+
+    $response->addMessage("You can't access link");
+
+    $response->send();
+    exit;
+}else{
+    
+    if($jsonData->gameVersion < 1.01){
+        $response = new Response();
+    $response->setHttpStatusCode(400);
+    $response->setSuccess(false);
+
+    $response->addMessage("Please Update Game First - your version is $jsonData->gameVersion");
+
+    $response->send();
+    exit;
+    }
+}
 $room = new RoomModel();
 if (isset($jsonData->boardSize) && !isset($jsonData->playerId)) {
 
@@ -68,7 +90,6 @@ if (isset($jsonData->boardSize) && !isset($jsonData->playerId)) {
 
     $response->send();
     exit;
-    return;
 } else if (isset($jsonData->playerId) && !isset($jsonData->boardSize)) {
     if (!isset($jsonData->roomId) || !isset($jsonData->number1) || !isset($jsonData->number2)) {
     } else {

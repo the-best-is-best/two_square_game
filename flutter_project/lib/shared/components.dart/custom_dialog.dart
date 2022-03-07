@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:dialogs/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:two_square_game/shared/components.dart/push_page.dart';
 
 import '../../screens/menu.dart';
 
@@ -25,8 +22,13 @@ MessageDialog customDialog({
         Navigator.of(context).pop();
         Navigator.of(context).pop();
       } else {
-        Navigator.of(context).pop();
-        pushReplacementAll(widget: const Menu(), context: context);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => const Menu(),
+          ),
+          (route) => false,
+        );
       }
     },
   );

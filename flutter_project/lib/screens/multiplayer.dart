@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:bot_toast/bot_toast.dart';
 import 'package:buildcondition/buildcondition.dart';
 import 'package:dialogs/dialogs/message_dialog.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tbib_style/style/font_style.dart';
@@ -11,7 +8,9 @@ import 'package:two_square_game/shared/components.dart/app_bar.dart';
 import 'package:two_square_game/shared/controller/multi_player_controller.dart';
 import 'package:two_square_game/shared/states/muli_player_states.dart';
 
+import '../shared/components.dart/back_clicked.dart';
 import '../shared/components.dart/custom_dialog.dart';
+import 'menu.dart';
 
 class MultiPlayer extends StatefulWidget {
   final int boardSize;
@@ -29,7 +28,7 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
       MultiPlayerController cubit =
-          MultiPlayerController.get(MultiPlayerController.context!);
+          MultiPlayerController.get(MultiPlayerController.context);
       cubit.logout();
     }
   }
@@ -57,13 +56,21 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
           cubit.makeOrJoinRoom(widget.boardSize);
           return BlocConsumer<MultiPlayerController, MultiPlyerStates>(
             listener: (BuildContext context, MultiPlyerStates state) async {
-              if (state is ServerError) {
-                Navigator.pop(context);
-              }
-              if (state is YouCannotPlayHere) {
+              if (state is UpdateGameAlert) {
+                BotToast.showText(text: "Please Update Game");
+                cubit.logout();
+              } else if (state is ServerError) {
+                BotToast.showText(text: "Server Error");
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => const Menu(),
+                  ),
+                  (route) => false,
+                );
+              } else if (state is YouCannotPlayHere) {
                 BotToast.showText(text: "you can't play here");
-              }
-              if (state is DrawGame) {
+              } else if (state is DrawGame) {
                 MessageDialog messageDialog = customDialog(
                     title: 'Alert',
                     context: context,
@@ -71,8 +78,7 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                     multiplayer: true);
 
                 messageDialog.show(context, barrierDismissible: true);
-              }
-              if (state is EndGame) {
+              } else if (state is EndGame) {
                 String info = cubit.playerWin == 0
                     ? "No One Win The Game"
                     : cubit.player() == cubit.playerWin
@@ -87,55 +93,63 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
               }
             },
             builder: (BuildContext context, MultiPlyerStates state) {
-              return Scaffold(
-                appBar: myAppBar("2 Square Game - multiplayer",
-                    multiplayer: true, cubit: cubit, context: context),
-                body: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: BuildCondition(
-                    condition: state is! WaitingPlayer,
-                    builder: (_) {
-                      String turn = cubit.turn() == cubit.player()
-                          ? "Your Turn"
-                          : "Opponent's Turn";
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            turn,
-                            style: TBIBFontStyle.b1,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            child: GridView.count(
-                              shrinkWrap: true,
-                              crossAxisCount: widget.boardSize,
-                              childAspectRatio: 1,
-                              crossAxisSpacing: 1,
-                              children: [
-                                for (int i = 0; i < cubit.board.length; i++)
-                                  Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: ElevatedButton(
-                                      onPressed: cubit.turn() != cubit.player()
-                                          ? null
-                                          : cubit.number1() == i + 1
-                                              ? null
-                                              : () =>
-                                                  cubit.selectNumbers(i + 1),
-                                      child: Text(cubit.board[i].toString()),
-                                    ),
-                                  ),
-                              ],
+              return WillPopScope(
+                onWillPop: () async {
+                  backClickedMultiPlayer(cubit, context);
+                  return false;
+                },
+                child: Scaffold(
+                  appBar: myAppBar("2 Square Game - multiplayer",
+                      multiplayer: true, cubit: cubit, context: context),
+                  body: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: BuildCondition(
+                      condition: state is GameReady,
+                      builder: (_) {
+                        String turn = cubit.turn() == cubit.player()
+                            ? "Your Turn"
+                            : "Opponent's Turn";
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              turn,
+                              style: TBIBFontStyle.b1,
                             ),
-                          ),
-                        ],
-                      );
-                    },
-                    fallback: (_) => Center(
-                      child: Text(
-                        "Waiting Another Player",
-                        style: TBIBFontStyle.b1,
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 12.0),
+                              child: GridView.count(
+                                shrinkWrap: true,
+                                crossAxisCount: widget.boardSize,
+                                childAspectRatio: 1,
+                                crossAxisSpacing: 1,
+                                children: [
+                                  for (int i = 0; i < cubit.board.length; i++)
+                                    Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: ElevatedButton(
+                                        onPressed: cubit.turn() !=
+                                                cubit.player()
+                                            ? null
+                                            : cubit.number1() == i + 1
+                                                ? null
+                                                : () =>
+                                                    cubit.selectNumbers(i + 1),
+                                        child: Text(cubit.board[i].toString()),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                      fallback: (_) => Center(
+                        child: Text(
+                          "Waiting Another Player",
+                          style: TBIBFontStyle.b1,
+                        ),
                       ),
                     ),
                   ),

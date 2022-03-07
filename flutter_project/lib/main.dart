@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:bot_toast/bot_toast.dart';
@@ -42,7 +41,7 @@ Future<void> _firebase() async {
 
     if (mapMessage != null && mapMessage['message'] != null) {
       MultiPlayerController cubit =
-          MultiPlayerController.get(MultiPlayerController.context!);
+          MultiPlayerController.get(MultiPlayerController.context);
 
       if (mapMessage['message'] == "joined") {
         cubit.playerJoined();

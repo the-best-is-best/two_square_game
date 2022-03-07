@@ -4,6 +4,8 @@ class MultiPlyerInitialState extends MultiPlyerStates {}
 
 class ServerError extends MultiPlyerStates {}
 
+class UpdateGameAlert extends MultiPlyerStates {}
+
 class WaitingPlayer extends MultiPlyerStates {}
 
 class GameReady extends MultiPlyerStates {}
