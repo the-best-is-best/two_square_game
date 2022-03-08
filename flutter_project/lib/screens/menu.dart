@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -7,6 +9,7 @@ import 'package:two_square_game/screens/multiplayer.dart';
 
 import '../shared/components.dart/app_bar.dart';
 import '../shared/components.dart/push_page.dart';
+import '../shared/models/interstitial_ad.dart';
 
 class Menu extends StatefulWidget {
   const Menu({Key? key}) : super(key: key);
@@ -16,6 +19,15 @@ class Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<Menu> {
+  @override
+  void initState() {
+    super.initState();
+    MyInterstitial.init();
+    WidgetsBinding.instance!.addPostFrameCallback((_) => Future.delayed(
+        const Duration(milliseconds: 500),
+        () => MyInterstitial.getInterstitialAd().show()));
+  }
+
   int boardSize = 4;
   String displayMode = "Easy";
   @override
@@ -107,7 +119,8 @@ class _MenuState extends State<Menu> {
                       ),
                       const Padding(padding: EdgeInsets.only(top: 20)),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          MyInterstitial.getAd();
                           push(
                             context: context,
                             widget: Game(boardSize),
@@ -127,7 +140,7 @@ class _MenuState extends State<Menu> {
                       ),
                       const Padding(padding: EdgeInsets.only(top: 20)),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           pushReplacementAll(
                             context: context,
                             widget: MultiPlayer(boardSize),

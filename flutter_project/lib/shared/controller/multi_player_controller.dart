@@ -15,6 +15,8 @@ import '../states/muli_player_states.dart';
 
 class MultiPlayerController extends Cubit<MultiPlyerStates>
     with CreateRoomController, JoinRoomController {
+  bool adLoaded = false;
+
   MultiPlayerController() : super(MultiPlyerInitialState());
   static MultiPlayerController get(BuildContext context) =>
       BlocProvider.of(context);
@@ -34,7 +36,12 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
 
   int? _number1, _number2;
   int? number1() => _number1;
+//int endTime = DateTime.now().millisecondsSinceEpoch + 1000 * 30;
+  late int countdownTimerTurn;
+  bool _gameStarted = false;
+
   void makeOrJoinRoom(int boardSize) async {
+    adLoaded = true;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
     try {
@@ -89,6 +96,7 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
   }
 
   void playerJoined() {
+    _gameStarted = true;
     emit(GameReady());
   }
 
@@ -175,19 +183,22 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
   }
 
   void logout() async {
+    _closeAd();
     if (_idRoom != null) {
-      Map sendData = {};
-      if (_player == 1) {
-        sendData = {"message": "player win 2"};
-      } else {
-        sendData = {"message": "player win 1"};
-      }
-
-      await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
-      await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
-
       await DioHelper.postData(
           url: "delete/room_delete.php", query: {"roomId": _idRoom});
+
+      if (_gameStarted) {
+        Map sendData = {};
+        if (_player == 1) {
+          sendData = {"message": "player win 2"};
+        } else {
+          sendData = {"message": "player win 1"};
+        }
+
+        await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
+      }
+      await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
     }
     Navigator.pushAndRemoveUntil(
       context,
@@ -196,6 +207,11 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
       ),
       (route) => false,
     );
+  }
+
+  void _closeAd() {
+    adLoaded = false;
+    emit(EndGame());
   }
 
   void endGame(int? player) async {

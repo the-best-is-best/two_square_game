@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:two_square_game/shared/states/game_states.dart';
 
 class GameController extends Cubit<GameStates> {
+  bool adLoaded = false;
+
   GameController() : super(GameInitialState());
   static GameController get(context) => BlocProvider.of(context);
 
@@ -19,12 +21,18 @@ class GameController extends Cubit<GameStates> {
   bool loading = false;
   int totalGameNum = 0;
 
+  void closeAd() {
+    adLoaded = false;
+    emit(Closed());
+  }
+
   void gameMode(int addBoardSize) {
     boardSize = addBoardSize;
     emit(GamePlayed());
   }
 
   void startGame() async {
+    adLoaded = true;
     loading = true;
     totalGameNum = pow(boardSize, 2).toInt();
 

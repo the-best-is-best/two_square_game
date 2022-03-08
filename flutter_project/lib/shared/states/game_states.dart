@@ -13,3 +13,5 @@ class DrawGame extends GameStates {}
 class WinGame extends GameStates {}
 
 class LoadingGame extends GameStates {}
+
+class Closed extends GameStates {}
