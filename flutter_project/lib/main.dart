@@ -103,12 +103,15 @@ class MyApp extends StatelessWidget {
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],
       theme: ThemeData(
-        scaffoldBackgroundColor: HexColor("8c3839"),
+        //scaffoldBackgroundColor: HexColor("8c3839"),
+        scaffoldBackgroundColor: const Color.fromRGBO(127, 40, 45, 1),
         //primaryColor: HexColor("cedeeb"),
 
         elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-                primary: const Color.fromRGBO(206, 222, 235, .5))),
+          //primary: const Color.fromRGBO(206, 222, 235, .5)
+          primary: const Color.fromRGBO(182, 82, 81, 1),
+        )),
       ),
       home: const SplashScreen(),
     );
