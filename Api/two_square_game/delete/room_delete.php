@@ -51,7 +51,7 @@ if(!isset($jsonData->roomId)){
     
     
 }else{
-$query = $writeDB->prepare('DELETE FROM rooms  WHERE id = :id');
+$query = $writeDB->prepare('DELETE FROM rooms_two_square_game  WHERE id = :id');
 
 $query->bindParam(':id', $jsonData->roomId, PDO::PARAM_STR);
 $query->execute();

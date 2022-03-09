@@ -95,6 +95,17 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                     meesage: info,
                     multiplayer: true);
                 messageDialog.show(context, barrierDismissible: true);
+              } else if (state is LogoutGame) {
+                MessageDialog messageDialog = customDialog(
+                    title: 'Alert',
+                    context: context,
+                    meesage: "You Lost The Game",
+                    multiplayer: true);
+                messageDialog.show(context, barrierDismissible: true);
+              } else if (state is StopTime) {
+                cubit.stopTime(controllerCountdownTimer!);
+              } else if (state is StartTime) {
+                cubit.startTime(controllerCountdownTimer!);
               }
             },
             builder: (BuildContext context, MultiPlyerStates state) {
@@ -110,14 +121,9 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                   body: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: BuildCondition(
-                      condition: state is WaitingPlayer,
-                      builder: (_) => Center(
-                        child: Text(
-                          "Waiting Another Player",
-                          style: TBIBFontStyle.b1,
-                        ),
-                      ),
-                      fallback: (_) {
+                      condition:
+                          state is! WaitingPlayer && cubit.turn() != null,
+                      builder: (_) {
                         String turn = cubit.turn() == cubit.player()
                             ? "Your Turn"
                             : "Opponent's Turn";
@@ -129,10 +135,13 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  CountdownTimer(
-                                    controller: controllerCountdownTimer,
-                                    onEnd: cubit.logout,
-                                    endTime: cubit.countdownTimerTurn,
+                                  BuildCondition(
+                                    condition: cubit.countdownTimerTurn != null,
+                                    builder: (_) => CountdownTimer(
+                                      controller: controllerCountdownTimer,
+                                      onEnd: cubit.timeOut,
+                                      endTime: cubit.countdownTimerTurn,
+                                    ),
                                   ),
                                   Text(
                                     turn,
@@ -174,6 +183,7 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                               condition: cubit.adLoaded,
                               builder: (_) => Expanded(
                                 child: Container(
+                                  color: Colors.blue,
                                   alignment: Alignment.center,
                                   width:
                                       MyBannerAd.myBanner.size.width.toDouble(),
@@ -186,6 +196,12 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                           ],
                         );
                       },
+                      fallback: (_) => Center(
+                        child: Text(
+                          "Waiting Another Player",
+                          style: TBIBFontStyle.b1,
+                        ),
+                      ),
                     ),
                   ),
                 ),

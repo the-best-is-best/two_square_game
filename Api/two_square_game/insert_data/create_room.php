@@ -2,6 +2,7 @@
 
 function  makeRooms($boardSize)
 {
+    
     try {
         $writeDB = DB::connectionWriteDB();
         $readDB = DB::connectionWriteDB();
@@ -15,7 +16,7 @@ function  makeRooms($boardSize)
         exit;
     }
 
-    $query = $writeDB->prepare('SELECT * FROM rooms ORDER BY id DESC LIMIT 1');
+    $query = $writeDB->prepare('SELECT * FROM rooms_two_square_game ORDER BY id DESC LIMIT 1');
     $query->execute();
     $row = $query->fetch();
     $id = 1;
@@ -29,7 +30,7 @@ function  makeRooms($boardSize)
         array_push($board, $i + 1);
     }
     $board =  json_encode($board);
-    $query = $writeDB->prepare('INSERT into rooms (id  , board , boardSize ,totalGameNum)
+    $query = $writeDB->prepare('INSERT into rooms_two_square_game (id  , board , boardSize ,totalGameNum)
     VALUES (:id , :board , :boardSize , :totalGameNum)');
 
     $query->bindParam(':id', $id, PDO::PARAM_STR);
@@ -48,7 +49,7 @@ function  makeRooms($boardSize)
         $response->send();
         exit;
     }
-    $query = $readDB->prepare("SELECT * FROM rooms ORDER BY id DESC LIMIT 1");
+    $query = $readDB->prepare("SELECT * FROM rooms_two_square_game ORDER BY id DESC LIMIT 1");
     $query->execute();
     $row = $query->fetch();
 

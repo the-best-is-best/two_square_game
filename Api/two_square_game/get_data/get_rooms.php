@@ -21,7 +21,7 @@ function joinOrCreateRooms($boardSize)
         exit;
     }
 
-    $query = $readDB->prepare("SELECT * FROM rooms WHERE boardSize = $boardSize  AND started = 0");
+    $query = $readDB->prepare("SELECT * FROM rooms_two_square_game WHERE boardSize = $boardSize  AND started = 0");
     $query->execute();
     $row = $query->fetch();
     if (empty($row)) {
@@ -30,7 +30,7 @@ function joinOrCreateRooms($boardSize)
     } else {
 
         JoinRoom($readDB, $row['id']);
-        $query = $readDB->prepare("SELECT * FROM rooms WHERE boardSize = $boardSize  AND started = 1 ORDER BY id DESC LIMIT 1");
+        $query = $readDB->prepare("SELECT * FROM rooms_two_square_game WHERE boardSize = $boardSize  AND started = 1 ORDER BY id DESC LIMIT 1");
         $query->execute();
         $row = $query->fetch();
         $response = new Response();
@@ -55,7 +55,7 @@ function GetDataRoom($id){
         $response->send();
         exit;
     }
-    $query = $readDB->prepare("SELECT * FROM rooms WHERE id = $id ");
+    $query = $readDB->prepare("SELECT * FROM rooms_two_square_game WHERE id = $id ");
     $query->execute();
     $row = $query->fetch();
     $response = new Response();

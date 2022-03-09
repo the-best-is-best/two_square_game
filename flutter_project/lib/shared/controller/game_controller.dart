@@ -23,7 +23,7 @@ class GameController extends Cubit<GameStates> {
 
   void closeAd() {
     adLoaded = false;
-    emit(Closed());
+    emit(ClosedAd());
   }
 
   void gameMode(int addBoardSize) {

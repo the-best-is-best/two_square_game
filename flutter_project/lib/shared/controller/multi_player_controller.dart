@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:bot_toast/bot_toast.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
 import 'package:two_square_game/shared/controller/multi_player/create_room_controller.dart';
 import 'package:two_square_game/shared/controller/multi_player/join_room_controller.dart';
 import 'package:two_square_game/shared/network/dio_network.dart';
@@ -26,8 +28,8 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
   late int _player;
   int player() => _player;
 
-  late int _turn;
-  int turn() => _turn;
+  int? _turn;
+  int? turn() => _turn;
 
   int? _idRoom;
   int? idRoom() => _idRoom;
@@ -36,52 +38,20 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
 
   int? _number1, _number2;
   int? number1() => _number1;
-//int endTime = DateTime.now().millisecondsSinceEpoch + 1000 * 30;
-  late int countdownTimerTurn;
+  int? countdownTimerTurn;
   bool _gameStarted = false;
 
   void makeOrJoinRoom(int boardSize) async {
     adLoaded = true;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
+    late Response response;
     try {
       emit(WaitingPlayer());
-      var response =
+      response =
           await DioHelper.postData(url: "controller/control_room.php", query: {
         "gameVersion": packageInfo.buildNumber,
         "boardSize": boardSize,
       });
-      var data = response.data;
-      String message = data['messages'][0];
-      Map<String, String>? serverData;
-
-      if (message.contains("Please Update Game First")) {
-        log(message);
-        emit(UpdateGameAlert());
-        return;
-      } else if (message == "Room Created") {
-        serverData = super.createRoom(data['data']);
-      } else {
-        serverData = super.joinRoom(data['data']);
-      }
-      if (serverData != null) {
-        board = jsonDecode(serverData['board']!);
-        _player = int.parse(serverData['player']!);
-        _idRoom = int.parse(serverData['id']!);
-        _turn = 1;
-
-        await FirebaseMessaging.instance.subscribeToTopic("room_$_idRoom");
-        await Future.delayed(const Duration(milliseconds: 500));
-
-        if (data['messages'][0] == "Room Created") {
-          return;
-        }
-        Map sendData = {"message": "joined"};
-
-        await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
-      } else {
-        emit(ServerError());
-      }
     } catch (ex) {
       BotToast.showText(text: "Server Error");
       Navigator.pushAndRemoveUntil(
@@ -92,6 +62,36 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
         (route) => false,
       );
       log(packageInfo.buildNumber.toString());
+    }
+    var data = response.data;
+    String message = data['messages'][0];
+    Map<String, String>? serverData;
+    debugPrint(message);
+    if (message.contains("Please Update Game First")) {
+      emit(UpdateGameAlert());
+      return;
+    } else if (message == "Room Created") {
+      serverData = super.createRoom(data['data']);
+    } else {
+      serverData = super.joinRoom(data['data']);
+    }
+    if (serverData != null) {
+      board = jsonDecode(serverData['board']!);
+      _player = int.parse(serverData['player']!);
+      _idRoom = int.parse(serverData['id']!);
+      _turn = 1;
+
+      await FirebaseMessaging.instance.subscribeToTopic("room_$_idRoom");
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      if (message == "Room Created") {
+        return;
+      }
+      Map sendData = {"message": "joined"};
+
+      await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
+    } else {
+      emit(ServerError());
     }
   }
 
@@ -135,12 +135,14 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
     } else if (message == "No One Win The Game") {
       _getBoardLocal(num1, num2);
       Map sendData = {"message": "No One Win The Game"};
+      emit(StopTime());
 
       await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
       emit(DrawGame());
     } else if (message == "Next Player") {
       _getBoardLocal(num1, num2);
       int nextTurn = _player == 1 ? 2 : 1;
+      emit(StopTime());
 
       Map sendData = {"message": "Get Data Player-$nextTurn"};
 
@@ -148,6 +150,7 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
       emit(GameReady());
     } else if (message == "Player Win") {
       Map sendData = {"message": "Player Win-$_player"};
+      emit(StopTime());
 
       await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
 
@@ -158,6 +161,20 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
       logout();
     }
     BotToast.closeAllLoading();
+  }
+
+  void stopTime(CountdownTimerController timerController) {
+    timerController.disposeTimer();
+    emit(StopTime());
+  }
+
+  void startTime(CountdownTimerController timerController) {
+    timerController.start();
+    emit(GameReady());
+  }
+
+  void firebaseStartTime() {
+    emit(StartTime());
   }
 
   void _getBoardLocal(int num1, int num2) {
@@ -175,11 +192,17 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
       _turn = _turn == 1 ? 2 : 1;
       board = jsonDecode(response.data['data']['board']);
       BotToast.closeAllLoading();
+      Map sendData = {"message": "Start Time"};
+      await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
       emit(GameReady());
     } else {
       _turn = _turn == 1 ? 2 : 1;
       emit(GameReady());
     }
+  }
+
+  void timeOut() {
+    if (_turn == _player) logout();
   }
 
   void logout() async {
@@ -200,18 +223,12 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
       }
       await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
     }
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext context) => const Menu(),
-      ),
-      (route) => false,
-    );
+
+    emit(LogoutGame());
   }
 
   void _closeAd() {
     adLoaded = false;
-    emit(EndGame());
   }
 
   void endGame(int? player) async {

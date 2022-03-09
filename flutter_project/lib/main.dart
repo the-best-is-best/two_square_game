@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:tbib_style/tbib_style.dart';
+import 'package:two_square_game/shared/models/my_banner_ad.dart';
 import 'package:two_square_game/shared/network/dio_network.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -15,13 +16,15 @@ import 'screens/splash_screen.dart';
 import 'shared/bloc_observer.dart';
 import 'shared/controller/multi_player_controller.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
   _firebase();
   _fonts();
   DioHelper();
+  await MyBannerAd.myBanner.load();
 
+  MyBannerAd.loadWidget();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
@@ -34,8 +37,9 @@ void main() {
 }
 
 void _firebase() async {
-  await FirebaseMessaging.instance.deleteToken();
   await Firebase.initializeApp();
+  await FirebaseMessaging.instance.deleteToken();
+
   await FirebaseMessaging.instance.getToken();
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     Map? mapMessage;
@@ -46,7 +50,8 @@ void _firebase() async {
           MultiPlayerController.get(MultiPlayerController.context);
 
       if (mapMessage['message'] == "joined") {
-        cubit.countdownTimerTurn = DateTime.now().second + 30;
+        cubit.countdownTimerTurn =
+            DateTime.now().millisecondsSinceEpoch + 1000 * 30;
         cubit.playerJoined();
       } else if (mapMessage['message'] == "player win 1") {
         cubit.endGame(1);
@@ -56,14 +61,17 @@ void _firebase() async {
         cubit.endGame(0);
       } else if (mapMessage['message'].toString().contains("Get Data Player")) {
         List messageData = mapMessage['message'].toString().split('-');
-        cubit.countdownTimerTurn = DateTime.now().second + 30;
+        cubit.countdownTimerTurn =
+            DateTime.now().millisecondsSinceEpoch + 1000 * 30;
         int playerId = int.parse(messageData[1]);
         cubit.getBoard(playerId);
       } else if (mapMessage['message'].toString().contains("Player Win")) {
         List messageData = mapMessage['message'].toString().split('-');
         int playerId = int.parse(messageData[1]);
         cubit.endGame(playerId);
-      } else {}
+      } else if (mapMessage['message'].toString() == "Start Time") {
+        cubit.firebaseStartTime();
+      }
     }
   });
 }

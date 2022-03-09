@@ -3,11 +3,11 @@ import 'dart:developer';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class MyBannerAd {
-  static late AdWidget adWidget;
+  static AdWidget? adWidget;
   static final BannerAd myBanner = BannerAd(
     //  adUnitId: 'ca-app-pub-7284367511062855/6312687941',
     adUnitId: 'ca-app-pub-3940256099942544/6300978111',
-    size: AdSize.banner,
+    size: AdSize.largeBanner,
     request: const AdRequest(),
     listener: listenToAd(),
   );

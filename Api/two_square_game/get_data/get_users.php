@@ -47,7 +47,7 @@ try {
 
      
 
-    $query = $writeDB->prepare('SELECT * FROM users WHERE email = :email');
+    $query = $writeDB->prepare('SELECT * FROM users_two_square_game WHERE email = :email');
     $query->bindParam(':email', $_GET['email'], PDO::PARAM_STR);
    
     $query->execute();

@@ -4,6 +4,7 @@ import '../../screens/menu.dart';
 import '../controller/multi_player_controller.dart';
 
 void backClickedMultiPlayer(MultiPlayerController cubit, BuildContext context) {
+  // cubit.closeAd();
   if (cubit.idRoom() != null) {
     cubit.logout();
   } else {

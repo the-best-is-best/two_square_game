@@ -101,7 +101,7 @@ $email = trim($jsonData->email);
 $password =password_hash($password, PASSWORD_DEFAULT);
 
 try {
-    $query = $writeDB->prepare('SELECT id FROM users WHERE phone = :phone');
+    $query = $writeDB->prepare('SELECT id FROM users_two_square_game WHERE phone = :phone');
     $query->bindParam(':phone', $phone, PDO::PARAM_STR);
     $query->execute();
 
@@ -115,7 +115,7 @@ try {
         exit;
     }
 
-    $query = $writeDB->prepare('SELECT id FROM users WHERE email = :email');
+    $query = $writeDB->prepare('SELECT id FROM users_two_square_game WHERE email = :email');
     $query->bindParam(':email', $email, PDO::PARAM_STR);
     $query->execute();
 

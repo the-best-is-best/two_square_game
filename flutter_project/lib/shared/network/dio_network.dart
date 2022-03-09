@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 
 class DioHelper {
@@ -7,17 +5,17 @@ class DioHelper {
   static late Dio sendMessage;
 
   DioHelper() {
-    dio = Dio(BaseOptions(
-      baseUrl: 'http://192.168.1.6/two_square_game/',
+    /* dio = Dio(BaseOptions(
+      baseUrl: 'http://192.168.1.7/two_square_game/',
       receiveDataWhenStatusError: false,
     ));
-
+*/
 // http://michelleaccademy.epizy.com/two_square_game/
-/*
+
     dio = Dio(BaseOptions(
       baseUrl: 'http://michelleacademy.getenjoyment.net/two_square_game/',
       receiveDataWhenStatusError: true,
-    ));*/
+    ));
 
     sendMessage = Dio(BaseOptions(
       baseUrl: 'https://fcm.googleapis.com/fcm/send',

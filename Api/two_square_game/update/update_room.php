@@ -3,7 +3,7 @@ require_once '../delete/room_delete_end.php';
 function JoinRoom($writeDB, $id)
 {
 
-    $query = $writeDB->prepare('UPDATE rooms SET started = :started , id_user2=:id_user2 WHERE id = :id ');
+    $query = $writeDB->prepare('UPDATE rooms_two_square_game SET started = :started , id_user2=:id_user2 WHERE id = :id ');
     $started = 1;
     $id_user2 = 2;
     $query->bindParam(':id', $id, PDO::PARAM_STR);
@@ -26,7 +26,7 @@ function playController($id, $playerId, $action1, $action2)
         $response->send();
         exit;
     }
-    $query = $readDB->prepare("SELECT * FROM rooms WHERE id = $id");
+    $query = $readDB->prepare("SELECT * FROM rooms_two_square_game WHERE id = $id");
     $query->execute();
     $row = $query->fetch();
 
@@ -117,7 +117,7 @@ function playController($id, $playerId, $action1, $action2)
             if ($turns != 0) {
                 $board =  json_encode($board);
 
-                $query = $writeDB->prepare('UPDATE rooms SET turn = :turn , board= :board WHERE id = :id ');
+                $query = $writeDB->prepare('UPDATE rooms_two_square_game SET turn = :turn , board= :board WHERE id = :id ');
                 $turn = $row['turn'] == 1 ? 2 : 1;
 
                 $query->bindParam(':id', $id, PDO::PARAM_STR);

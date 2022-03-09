@@ -14,4 +14,4 @@ class WinGame extends GameStates {}
 
 class LoadingGame extends GameStates {}
 
-class Closed extends GameStates {}
+class ClosedAd extends GameStates {}

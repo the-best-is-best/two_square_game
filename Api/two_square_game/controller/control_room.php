@@ -38,28 +38,7 @@ if (!$jsonData = json_decode($rowPostData)) {
     $response->send();
     exit;
 }
-if(!isset($jsonData->gameVersion)){
-    $response = new Response();
-    $response->setHttpStatusCode(400);
-    $response->setSuccess(false);
 
-    $response->addMessage("You can't access link");
-
-    $response->send();
-    exit;
-}else{
-    
-    if($jsonData->gameVersion < 1.01){
-        $response = new Response();
-    $response->setHttpStatusCode(400);
-    $response->setSuccess(false);
-
-    $response->addMessage("Please Update Game First - your version is $jsonData->gameVersion");
-
-    $response->send();
-    exit;
-    }
-}
 $room = new RoomModel();
 if (isset($jsonData->boardSize) && !isset($jsonData->playerId)) {
 
@@ -78,7 +57,29 @@ if (isset($jsonData->boardSize) && !isset($jsonData->playerId)) {
         exit;
     }
 
+    if(!isset($jsonData->gameVersion)){
+        $response = new Response();
+        $response->setHttpStatusCode(400);
+        $response->setSuccess(false);
     
+        $response->addMessage("You can't access link");
+    
+        $response->send();
+        exit;
+        
+    }else{
+        
+        if($jsonData->gameVersion < 2){
+            $response = new Response();
+        $response->setHttpStatusCode(400);
+        $response->setSuccess(false);
+    
+        $response->addMessage("Please Update Game First - your version is $jsonData->gameVersion");
+    
+        $response->send();
+        exit;
+        }
+    }
     $boardSize = trim($jsonData->boardSize);
 
     $room->joinOrCreate($boardSize);

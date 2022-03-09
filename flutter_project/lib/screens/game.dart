@@ -22,9 +22,6 @@ class Game extends StatefulWidget {
 class _GameState extends State<Game> {
   @override
   void initState() {
-    MyBannerAd.myBanner.load();
-
-    MyBannerAd.loadWidget();
     super.initState();
   }
 
