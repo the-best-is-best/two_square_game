@@ -1,13 +1,11 @@
 import 'dart:convert';
-
 import 'package:bloc/bloc.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:tbib_style/tbib_style.dart';
-import 'package:two_square_game/shared/models/my_banner_ad.dart';
+import 'package:two_square_game/shared/ads/my_banner_ad.dart';
 import 'package:two_square_game/shared/network/dio_network.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -15,6 +13,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'screens/splash_screen.dart';
 import 'shared/bloc_observer.dart';
 import 'shared/controller/multi_player_controller.dart';
+import 'shared/const/device_is_tablet.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +24,7 @@ void main() async {
   await MyBannerAd.myBanner.load();
 
   MyBannerAd.loadWidget();
+
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
@@ -77,6 +77,11 @@ void _firebase() async {
 }
 
 void _fonts() {
+  if (DeviceIsTablet.isTablet()) {
+    TBIBFontStyle.defaultFlutterStyle();
+    TBIBFontStyle.h4 = TBIBFontStyle.h4.copyWith(fontWeight: FontWeight.w400);
+    TBIBFontStyle.h3 = TBIBFontStyle.h3.copyWith(fontWeight: FontWeight.w600);
+  }
   TBIBFontStyle.h4 = TBIBFontStyle.h4.copyWith(
     color: const Color.fromRGBO(206, 222, 235, .5),
   );

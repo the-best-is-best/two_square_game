@@ -7,7 +7,8 @@ import 'package:two_square_game/screens/multiplayer.dart';
 
 import '../shared/components.dart/app_bar.dart';
 import '../shared/components.dart/push_page.dart';
-import '../shared/models/interstitial_ad.dart';
+import '../shared/ads/interstitial_ad.dart';
+import '../shared/const/device_is_tablet.dart';
 
 class Menu extends StatefulWidget {
   const Menu({Key? key}) : super(key: key);
@@ -44,135 +45,147 @@ class _MenuState extends State<Menu> {
             width: size.width,
             child: Column(
               children: [
-                Image.asset(
-                  "assets/img/game icon.png",
-                  height: 150,
+                Expanded(
+                  child: Image.asset(
+                    "assets/img/game icon.png",
+                    height: 150,
+                  ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 12.0),
+                  padding: const EdgeInsets.only(top: 20.0),
                   child: Text("2 SQUARE GAME", style: TBIBFontStyle.h4),
                 ),
-                SizedBox(
-                  height: size.height / 3,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 150,
-                        height: 55,
-                        child: DropdownButton<String>(
-                          value: displayMode,
-                          style: TBIBFontStyle.h4,
-                          iconSize: 45,
-                          icon: const Icon(Icons.arrow_drop_down),
-                          isExpanded: true,
-                          elevation: 16,
-                          dropdownColor: HexColor("8c3839"),
-                          iconEnabledColor:
-                              const Color.fromRGBO(206, 222, 235, .5),
-                          underline: Container(
-                            height: 4,
-                            color: const Color.fromRGBO(206, 222, 235, .5),
-                          ),
-                          onChanged: (String? val) {
-                            switch (val) {
-                              case 'Easy':
-                                setState(() {
+                Expanded(
+                  flex: 4,
+                  child: SizedBox(
+                    height: size.height / 3,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 250,
+                          height: 55,
+                          child: DropdownButton<String>(
+                            value: displayMode,
+                            style: TBIBFontStyle.h1,
+                            iconSize: 45,
+                            icon: const Icon(Icons.arrow_drop_down),
+                            isExpanded: true,
+                            elevation: 16,
+                            dropdownColor: HexColor("8c3839"),
+                            iconEnabledColor:
+                                const Color.fromRGBO(206, 222, 235, .5),
+                            underline: Container(
+                              height: 4,
+                              color: const Color.fromRGBO(206, 222, 235, .5),
+                            ),
+                            onChanged: (String? val) {
+                              switch (val) {
+                                case 'Easy':
+                                  setState(() {
+                                    boardSize = 4;
+                                    displayMode = "Easy";
+                                  });
+                                  break;
+
+                                case 'Medium':
+                                  setState(() {
+                                    displayMode = "Medium";
+                                    boardSize = 5;
+                                  });
+
+                                  break;
+
+                                case 'Hard':
+                                  setState(() {
+                                    displayMode = "Hard";
+                                    boardSize = 6;
+                                  });
+
+                                  break;
+                                default:
                                   boardSize = 4;
-                                  displayMode = "Easy";
-                                });
-                                break;
-
-                              case 'Medium':
-                                setState(() {
-                                  displayMode = "Medium";
-                                  boardSize = 5;
-                                });
-
-                                break;
-
-                              case 'Hard':
-                                setState(() {
-                                  displayMode = "Hard";
-                                  boardSize = 6;
-                                });
-
-                                break;
-                              default:
-                                boardSize = 4;
-                            }
-                          },
-                          items: <String>['Easy', 'Medium', 'Hard']
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: TBIBFontStyle.b1,
-                              ),
-                            );
-                          }).toList(),
+                              }
+                            },
+                            items: <String>['Easy', 'Medium', 'Hard']
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TBIBFontStyle.b1,
+                                ),
+                              );
+                            }).toList(),
+                          ),
                         ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 20)),
-                      ElevatedButton(
-                        onPressed: () async {
-                          MyInterstitial.getAd();
-                          push(
-                            context: context,
-                            widget: Game(boardSize),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                        const Padding(padding: EdgeInsets.only(top: 20)),
+                        ElevatedButton(
+                          onPressed: () async {
+                            MyInterstitial.getAd();
+                            push(
+                              context: context,
+                              widget: Game(boardSize),
+                            );
+                          },
                           child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 40.0),
-                            child: Text(
-                              "Play",
-                              style: TBIBFontStyle.h3,
+                            padding: const EdgeInsets.all(8.0),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 40.0),
+                              child: Text(
+                                "Play",
+                                style: TBIBFontStyle.h3,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 20)),
-                      ElevatedButton(
-                        onPressed: () async {
-                          pushReplacementAll(
-                            context: context,
-                            widget: MultiPlayer(boardSize),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "Multiplayer",
-                            style: TBIBFontStyle.h4,
+                        const Padding(padding: EdgeInsets.only(top: 20)),
+                        ElevatedButton(
+                          onPressed: () async {
+                            pushReplacementAll(
+                              context: context,
+                              widget: MultiPlayer(boardSize),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "Multiplayer",
+                              style: TBIBFontStyle.h4,
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    children: [
+                      const Padding(padding: EdgeInsets.only(top: 75)),
+                      Text(
+                        "Special Thanks :",
+                        style: TBIBFontStyle.h3,
+                      ),
+                      const Padding(padding: EdgeInsets.only(top: 12)),
+                      Text(
+                        "Michelle Raouf",
+                        style: DeviceIsTablet.isTablet()
+                            ? TBIBFontStyle.h4
+                            : TBIBFontStyle.h5,
+                      ),
+                      const Padding(padding: EdgeInsets.only(top: 12)),
+                      Text(
+                        "John Raouf",
+                        style: DeviceIsTablet.isTablet()
+                            ? TBIBFontStyle.h4
+                            : TBIBFontStyle.h5,
                       ),
                     ],
                   ),
-                ),
-                Column(
-                  children: [
-                    const Padding(padding: EdgeInsets.only(top: 75)),
-                    Text(
-                      "Special Thanks :",
-                      style: TBIBFontStyle.h3,
-                    ),
-                    const Padding(padding: EdgeInsets.only(top: 12)),
-                    Text(
-                      "Michelle Raouf",
-                      style: TBIBFontStyle.h5,
-                    ),
-                    const Padding(padding: EdgeInsets.only(top: 12)),
-                    Text(
-                      "John Raouf",
-                      style: TBIBFontStyle.h5,
-                    ),
-                  ],
                 )
               ],
             ),

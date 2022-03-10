@@ -12,7 +12,7 @@ import 'package:two_square_game/shared/states/muli_player_states.dart';
 
 import '../shared/components.dart/back_clicked.dart';
 import '../shared/components.dart/custom_dialog.dart';
-import '../shared/models/my_banner_ad.dart';
+import '../shared/ads/my_banner_ad.dart';
 import 'menu.dart';
 
 class MultiPlayer extends StatefulWidget {
@@ -141,11 +141,16 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                                       controller: controllerCountdownTimer,
                                       onEnd: cubit.timeOut,
                                       endTime: cubit.countdownTimerTurn,
+                                      textStyle: TBIBFontStyle.b1,
                                     ),
                                   ),
-                                  Text(
-                                    turn,
-                                    style: TBIBFontStyle.b1,
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12.0),
+                                    child: Text(
+                                      turn,
+                                      style: TBIBFontStyle.b1,
+                                    ),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -162,6 +167,12 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                                           Padding(
                                             padding: const EdgeInsets.all(4.0),
                                             child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                primary: cubit.board[i] == "x"
+                                                    ? const Color.fromRGBO(
+                                                        182, 82, 81, .5)
+                                                    : null,
+                                              ),
                                               onPressed: cubit.turn() !=
                                                       cubit.player()
                                                   ? null
@@ -183,7 +194,6 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                               condition: cubit.adLoaded,
                               builder: (_) => Expanded(
                                 child: Container(
-                                  color: Colors.blue,
                                   alignment: Alignment.center,
                                   width:
                                       MyBannerAd.myBanner.size.width.toDouble(),

@@ -212,19 +212,19 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
           url: "delete/room_delete.php", query: {"roomId": _idRoom});
 
       if (_gameStarted) {
+        log("start game" + _gameStarted.toString());
         Map sendData = {};
         if (_player == 1) {
           sendData = {"message": "player win 2"};
         } else {
           sendData = {"message": "player win 1"};
         }
+        emit(LogoutGame());
 
         await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
       }
       await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
     }
-
-    emit(LogoutGame());
   }
 
   void _closeAd() {

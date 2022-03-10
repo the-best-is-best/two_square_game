@@ -486,10 +486,10 @@ packages:
   tbib_style:
     dependency: "direct main"
     description:
-      name: tbib_style
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
+      path: "../../../tbib_library/tbib_style"
+      relative: true
+    source: path
+    version: "1.0.2"
   term_glyph:
     dependency: transitive
     description:

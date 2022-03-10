@@ -7,13 +7,12 @@ void backClickedMultiPlayer(MultiPlayerController cubit, BuildContext context) {
   // cubit.closeAd();
   if (cubit.idRoom() != null) {
     cubit.logout();
-  } else {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext context) => const Menu(),
-      ),
-      (route) => false,
-    );
   }
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (BuildContext context) => const Menu(),
+    ),
+    (route) => false,
+  );
 }
