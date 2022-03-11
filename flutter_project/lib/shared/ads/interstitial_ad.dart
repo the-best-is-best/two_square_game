@@ -7,7 +7,7 @@ class MyInterstitial {
   static InterstitialAd? getInterstitialAd() => _interstitialAd;
   static Future init() async {
     await InterstitialAd.load(
-      adUnitId: 'ca-app-pub-3940256099942544/1033173712',
+      adUnitId: 'ca-app-pub-7284367511062855/7574670867',
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (InterstitialAd ad) {

@@ -5,6 +5,7 @@ import 'package:tbib_style/tbib_style.dart';
 import 'package:two_square_game/screens/game.dart';
 import 'package:two_square_game/screens/multiplayer.dart';
 
+import '../shared/ads/my_banner_ad.dart';
 import '../shared/components.dart/app_bar.dart';
 import '../shared/components.dart/push_page.dart';
 import '../shared/ads/interstitial_ad.dart';
@@ -124,6 +125,7 @@ class _MenuState extends State<Menu> {
                         ElevatedButton(
                           onPressed: () async {
                             MyInterstitial.getAd();
+                            MyBannerAd.checkAdLoaded();
                             push(
                               context: context,
                               widget: Game(boardSize),
@@ -144,6 +146,7 @@ class _MenuState extends State<Menu> {
                         const Padding(padding: EdgeInsets.only(top: 20)),
                         ElevatedButton(
                           onPressed: () async {
+                            MyBannerAd.checkAdLoaded();
                             pushReplacementAll(
                               context: context,
                               widget: MultiPlayer(boardSize),
@@ -165,7 +168,7 @@ class _MenuState extends State<Menu> {
                   flex: 2,
                   child: Column(
                     children: [
-                      const Padding(padding: EdgeInsets.only(top: 75)),
+                      const Padding(padding: EdgeInsets.only(top: 50)),
                       Text(
                         "Special Thanks :",
                         style: TBIBFontStyle.h3,

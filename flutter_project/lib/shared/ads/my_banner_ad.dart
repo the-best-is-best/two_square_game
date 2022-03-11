@@ -8,7 +8,7 @@ class MyBannerAd {
   static AdWidget? adWidget;
   static final BannerAd myBanner = BannerAd(
     //  adUnitId: 'ca-app-pub-7284367511062855/6312687941',
-    adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+    adUnitId: 'ca-app-pub-7284367511062855/6312687941',
 
     size: DeviceIsTablet.isTablet() ? AdSize.leaderboard : AdSize.largeBanner,
     request: const AdRequest(),
@@ -16,8 +16,11 @@ class MyBannerAd {
   );
 
   final AdSize adSize = const AdSize(width: 320, height: 60);
+  static void checkAdLoaded() async {
+    adWidget == null ? myBanner.load() : null;
+  }
 
-  static void loadWidget() {
+  static void loadWidget() async {
     adWidget = AdWidget(ad: myBanner);
   }
 
@@ -29,7 +32,10 @@ class MyBannerAd {
 BannerAdListener listenToAd() {
   return BannerAdListener(
     // Called when an ad is successfully received.
-    onAdLoaded: (Ad ad) => log('Ad loaded.'),
+    onAdLoaded: (Ad ad) {
+      log('Ad loaded.');
+      MyBannerAd.loadWidget();
+    },
     // Called when an ad request failed.
     onAdFailedToLoad: (Ad ad, LoadAdError error) {
       // Dispose the ad here to free resources.

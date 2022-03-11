@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.1+2
+version: 1.0.2+3
 
 environment:
   sdk: ">=2.16.1 <3.0.0"
@@ -50,6 +50,7 @@ dependencies:
   package_info_plus: ^1.4.0
   google_mobile_ads: ^1.1.0
   flutter_countdown_timer: ^4.1.0
+  google_fonts: ^2.3.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -78,7 +79,7 @@ tbib_splash_screen:
   # Only one parameter can be used, color and background_image cannot both be set.
 
   color: "#6699cc"
-  image: "assets/img/my logo.png"
+  image: "assets/img/my logo 1.png"
 
   # Optional parameters are listed below.
   #image: assets/splashscreen_image.png

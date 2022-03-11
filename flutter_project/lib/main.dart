@@ -4,6 +4,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tbib_style/tbib_style.dart';
 import 'package:two_square_game/shared/ads/my_banner_ad.dart';
 import 'package:two_square_game/shared/network/dio_network.dart';
@@ -21,9 +22,8 @@ void main() async {
   _firebase();
   _fonts();
   DioHelper();
-  await MyBannerAd.myBanner.load();
 
-  MyBannerAd.loadWidget();
+  //MyBannerAd.loadWidget();
 
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -82,6 +82,7 @@ void _fonts() {
     TBIBFontStyle.h4 = TBIBFontStyle.h4.copyWith(fontWeight: FontWeight.w400);
     TBIBFontStyle.h3 = TBIBFontStyle.h3.copyWith(fontWeight: FontWeight.w600);
   }
+  TBIBFontStyle.lisenGoogleFont(GoogleFonts.spaceMono());
   TBIBFontStyle.h4 = TBIBFontStyle.h4.copyWith(
     color: const Color.fromRGBO(206, 222, 235, .5),
   );
@@ -104,6 +105,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: '2 Square Game',
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],
