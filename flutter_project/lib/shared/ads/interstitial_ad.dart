@@ -7,8 +7,9 @@ class MyInterstitial {
   static InterstitialAd? getInterstitialAd() => _interstitialAd;
   static Future init() async {
     await InterstitialAd.load(
+      //adUnitId: 'ca-app-pub-3940256099942544/1033173712',
       adUnitId: 'ca-app-pub-7284367511062855/7574670867',
-      request: const AdRequest(),
+      request: const AdRequest(extras: {'rdp': '1'}),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (InterstitialAd ad) {
           // Keep a reference to the ad so you can show it later.

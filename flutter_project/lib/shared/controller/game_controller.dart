@@ -28,7 +28,6 @@ class GameController extends Cubit<GameStates> {
 
   void gameMode(int addBoardSize) {
     boardSize = addBoardSize;
-    emit(GamePlayed());
   }
 
   void startGame() async {

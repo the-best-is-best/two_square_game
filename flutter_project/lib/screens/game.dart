@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tbib_style/tbib_style.dart';
 import 'package:two_square_game/shared/controller/game_controller.dart';
 import 'package:two_square_game/shared/states/game_states.dart';
+import 'package:two_square_game/shared/util/device_screen.dart';
 
 import '../shared/components.dart/app_bar.dart';
 import '../shared/components.dart/custom_dialog.dart';
@@ -21,14 +22,9 @@ class Game extends StatefulWidget {
 
 class _GameState extends State<Game> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: myAppBar('2 square game'),
+      appBar: myAppBar('Choose 2 Squares', context: context),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: BlocProvider(
@@ -102,11 +98,11 @@ class _GameState extends State<Game> {
                                           padding: const EdgeInsets.all(4.0),
                                           child: ElevatedButton(
                                             style: ElevatedButton.styleFrom(
-                                              primary: cubit.board[i] == "x"
-                                                  ? const Color.fromRGBO(
-                                                      182, 82, 81, .5)
-                                                  : null,
-                                            ),
+                                                primary: cubit.board[i] == "x"
+                                                    ? const Color.fromRGBO(
+                                                        182, 82, 81, .5)
+                                                    : null,
+                                                textStyle: TBIBFontStyle.b1),
                                             onPressed: cubit.number1() == i + 1
                                                 ? null
                                                 : () {
@@ -122,7 +118,8 @@ class _GameState extends State<Game> {
                             ),
                           ),
                           BuildCondition(
-                            condition: cubit.adLoaded,
+                            condition:
+                                cubit.adLoaded && MyBannerAd.adWidget != null,
                             builder: (_) => Expanded(
                               child: Container(
                                 alignment: Alignment.center,

@@ -116,7 +116,7 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                   return false;
                 },
                 child: Scaffold(
-                  appBar: myAppBar("2 Square Game - multiplayer",
+                  appBar: myAppBar("Choose 2 Squares - multiplayer",
                       multiplayer: true, cubit: cubit, context: context),
                   body: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -191,7 +191,8 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                               ),
                             ),
                             BuildCondition(
-                              condition: cubit.adLoaded,
+                              condition:
+                                  cubit.adLoaded && MyBannerAd.adWidget != null,
                               builder: (_) => Expanded(
                                 child: Container(
                                   alignment: Alignment.center,

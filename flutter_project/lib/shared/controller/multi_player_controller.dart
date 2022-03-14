@@ -40,6 +40,7 @@ class MultiPlayerController extends Cubit<MultiPlyerStates>
   int? number1() => _number1;
   int? countdownTimerTurn;
   bool _gameStarted = false;
+  bool gameStareted() => _gameStarted;
 
   void makeOrJoinRoom(int boardSize) async {
     adLoaded = true;

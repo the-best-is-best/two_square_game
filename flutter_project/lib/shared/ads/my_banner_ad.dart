@@ -2,25 +2,29 @@ import 'dart:developer';
 
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import '../const/device_is_tablet.dart';
+import '../util/device_screen.dart';
 
 class MyBannerAd {
   static AdWidget? adWidget;
   static final BannerAd myBanner = BannerAd(
-    //  adUnitId: 'ca-app-pub-7284367511062855/6312687941',
+    //adUnitId: 'ca-app-pub-3940256099942544/6300978111',
     adUnitId: 'ca-app-pub-7284367511062855/6312687941',
 
-    size: DeviceIsTablet.isTablet() ? AdSize.leaderboard : AdSize.largeBanner,
+    size: DeviceType.isLargeScreen()
+        ? AdSize.leaderboard
+        : DeviceType.isMediumScreen()
+            ? AdSize.largeBanner
+            : AdSize.banner,
     request: const AdRequest(),
     listener: listenToAd(),
   );
 
   final AdSize adSize = const AdSize(width: 320, height: 60);
-  static void checkAdLoaded() async {
+  static void checkAdLoaded() {
     adWidget == null ? myBanner.load() : null;
   }
 
-  static void loadWidget() async {
+  static void loadWidget() {
     adWidget = AdWidget(ad: myBanner);
   }
 

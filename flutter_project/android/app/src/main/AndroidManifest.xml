@@ -7,7 +7,7 @@
         
 
 
-        android:label="Two Square Game"
+        android:label="Choose Two Squares"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

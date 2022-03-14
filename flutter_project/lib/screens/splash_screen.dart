@@ -12,7 +12,7 @@ class SplashScreen extends StatelessWidget {
       navigateRoute: const Menu(),
       duration: const Duration(milliseconds: 610),
       imageSrc: "assets/lottie/logo.json",
-      logoSize: 500,
+      logoSize: 360,
     );
   }
 }
