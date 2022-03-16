@@ -7,12 +7,12 @@ import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:tbib_style/style/font_style.dart';
 import 'package:two_square_game/shared/components.dart/app_bar.dart';
-import 'package:two_square_game/shared/controller/multi_player_controller.dart';
-import 'package:two_square_game/shared/states/muli_player_states.dart';
 
 import '../shared/components.dart/back_clicked.dart';
 import '../shared/components.dart/custom_dialog.dart';
 import '../shared/ads/my_banner_ad.dart';
+import '../shared/cubit/multi_player_controller.dart';
+import '../shared/cubit/states/muli_player_states.dart';
 import 'menu.dart';
 
 class MultiPlayer extends StatefulWidget {
@@ -25,15 +25,14 @@ class MultiPlayer extends StatefulWidget {
 }
 
 class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
-  CountdownTimerController? controllerCountdownTimer;
+  CountdownTimerController? cubitCountdownTimer;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     //Do whatever you want in background
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
-      MultiPlayerController cubit =
-          MultiPlayerController.get(MultiPlayerController.context);
+      MultiPlayercubit cubit = MultiPlayercubit.get(MultiPlayercubit.context);
       cubit.logout();
     }
   }
@@ -53,13 +52,13 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) => MultiPlayerController(),
+      create: (BuildContext context) => MultiPlayercubit(),
       child: Builder(
         builder: (context) {
-          MultiPlayerController cubit = MultiPlayerController.get(context);
-          MultiPlayerController.context = context;
+          MultiPlayercubit cubit = MultiPlayercubit.get(context);
+          MultiPlayercubit.context = context;
           cubit.makeOrJoinRoom(widget.boardSize);
-          return BlocConsumer<MultiPlayerController, MultiPlyerStates>(
+          return BlocConsumer<MultiPlayercubit, MultiPlyerStates>(
             listener: (BuildContext context, MultiPlyerStates state) async {
               if (state is UpdateGameAlert) {
                 BotToast.showText(text: "Please Update Game");
@@ -82,30 +81,39 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                     meesage: "No one WIN the game",
                     multiplayer: true);
 
-                messageDialog.show(context, barrierDismissible: true);
+                messageDialog.show(context, barrierDismissible: false);
               } else if (state is EndGame) {
                 String info = cubit.playerWin == 0
                     ? "No One Win The Game"
-                    : cubit.player() == cubit.playerWin
-                        ? "You Win The Game"
-                        : "You Lost The Game";
+                    : cubit.playerWin == null
+                        ? "Room issue"
+                        : cubit.player() == cubit.playerWin
+                            ? "You Win The Game"
+                            : "You Lost The Game";
                 MessageDialog messageDialog = customDialog(
                     title: 'Alert',
                     context: context,
                     meesage: info,
                     multiplayer: true);
-                messageDialog.show(context, barrierDismissible: true);
+                messageDialog.show(context, barrierDismissible: false);
               } else if (state is LogoutGame) {
                 MessageDialog messageDialog = customDialog(
                     title: 'Alert',
                     context: context,
                     meesage: "You Lost The Game",
                     multiplayer: true);
-                messageDialog.show(context, barrierDismissible: true);
+                messageDialog.show(context, barrierDismissible: false);
               } else if (state is StopTime) {
-                cubit.stopTime(controllerCountdownTimer!);
+                cubit.stopTime(cubitCountdownTimer!);
               } else if (state is StartTime) {
-                cubit.startTime(controllerCountdownTimer!);
+                cubit.startTime(cubitCountdownTimer!);
+              } else if (state is RoomError) {
+                MessageDialog messageDialog = customDialog(
+                    title: 'Alert',
+                    context: context,
+                    meesage: "Room error",
+                    multiplayer: true);
+                messageDialog.show(context, barrierDismissible: false);
               }
             },
             builder: (BuildContext context, MultiPlyerStates state) {
@@ -138,7 +146,7 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                                   BuildCondition(
                                     condition: cubit.countdownTimerTurn != null,
                                     builder: (_) => CountdownTimer(
-                                      controller: controllerCountdownTimer,
+                                      controller: cubitCountdownTimer,
                                       onEnd: cubit.timeOut,
                                       endTime: cubit.countdownTimerTurn,
                                       textStyle: TBIBFontStyle.b1,

@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:tbib_style/style/font_style.dart';
 import 'package:two_square_game/shared/components.dart/back_clicked.dart';
-import 'package:two_square_game/shared/util/device_screen.dart';
 
-import '../controller/multi_player_controller.dart';
+import '../cubit/multi_player_controller.dart';
 
 AppBar myAppBar(String title,
     {bool multiplayer = false,
-    MultiPlayerController? cubit,
+    MultiPlayercubit? cubit,
     required BuildContext context}) {
   return multiplayer == true
       ? AppBar(

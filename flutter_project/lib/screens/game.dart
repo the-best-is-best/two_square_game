@@ -4,13 +4,12 @@ import 'package:dialogs/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tbib_style/tbib_style.dart';
-import 'package:two_square_game/shared/controller/game_controller.dart';
-import 'package:two_square_game/shared/states/game_states.dart';
-import 'package:two_square_game/shared/util/device_screen.dart';
 
 import '../shared/components.dart/app_bar.dart';
 import '../shared/components.dart/custom_dialog.dart';
 import '../shared/ads/my_banner_ad.dart';
+import '../shared/cubit/game_controller.dart';
+import '../shared/cubit/states/game_states.dart';
 
 class Game extends StatefulWidget {
   final int boardSize;
@@ -26,14 +25,14 @@ class _GameState extends State<Game> {
     return Scaffold(
       appBar: myAppBar('Choose 2 Squares', context: context),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(12.0),
         child: BlocProvider(
-          create: (BuildContext context) => GameController(),
+          create: (BuildContext context) => Gamecubit(),
           child: Builder(builder: (context) {
-            GameController cubit = GameController.get(context);
+            Gamecubit cubit = Gamecubit.get(context);
             cubit.boardSize = widget.boardSize;
             cubit.startGame();
-            return BlocConsumer<GameController, GameStates>(
+            return BlocConsumer<Gamecubit, GameStates>(
               listener: (BuildContext context, GameStates state) async {
                 if (state is CannotPlayHere) {
                   BotToast.showText(
@@ -102,6 +101,8 @@ class _GameState extends State<Game> {
                                                     ? const Color.fromRGBO(
                                                         182, 82, 81, .5)
                                                     : null,
+                                                padding:
+                                                    const EdgeInsets.all(0),
                                                 textStyle: TBIBFontStyle.b1),
                                             onPressed: cubit.number1() == i + 1
                                                 ? null

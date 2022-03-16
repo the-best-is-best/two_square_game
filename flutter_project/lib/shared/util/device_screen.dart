@@ -1,8 +1,6 @@
 import 'dart:developer';
 import 'dart:ui';
 
-import 'package:tbib_style/style/font_style.dart';
-
 class DeviceType {
   static double pixelRatio = window.devicePixelRatio;
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../screens/menu.dart';
-import '../controller/multi_player_controller.dart';
+import '../cubit/multi_player_controller.dart';
 
-void backClickedMultiPlayer(MultiPlayerController cubit, BuildContext context) {
+void backClickedMultiPlayer(MultiPlayercubit cubit, BuildContext context) {
   if (cubit.idRoom() != null) {
     cubit.logout();
   }

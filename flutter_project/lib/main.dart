@@ -13,13 +13,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tbib_style/tbib_style.dart';
 import 'package:two_square_game/screens/splash_screen.dart';
-import 'package:two_square_game/shared/controller/menu_controller.dart';
+import 'package:two_square_game/shared/cubit/menu_controller.dart';
+import 'package:two_square_game/shared/cubit/multi_player_controller.dart';
 import 'package:two_square_game/shared/network/dio_network.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'shared/bloc_observer.dart';
-import 'shared/controller/multi_player_controller.dart';
 import 'shared/util/device_screen.dart';
 
 const _kShouldTestAsyncErrorOnInit = false;
@@ -65,8 +65,7 @@ Future<void> _firebase() async {
     mapMessage = json.decode(message.data['listen']);
 
     if (mapMessage != null && mapMessage['message'] != null) {
-      MultiPlayerController cubit =
-          MultiPlayerController.get(MultiPlayerController.context);
+      MultiPlayercubit cubit = MultiPlayercubit.get(MultiPlayercubit.context);
 
       if (mapMessage['message'] == "joined") {
         cubit.countdownTimerTurn =
@@ -90,6 +89,8 @@ Future<void> _firebase() async {
         cubit.endGame(playerId);
       } else if (mapMessage['message'].toString() == "Start Time") {
         cubit.firebaseStartTime();
+      } else if (mapMessage['message'] == "Room issue") {
+        cubit.endGame(0);
       }
     }
   });
@@ -174,8 +175,8 @@ class _MyAppState extends State<MyApp> {
       builder: () {
         return MultiBlocProvider(
           providers: [
-            BlocProvider<MenuController>(
-                create: (BuildContext context) => MenuController()),
+            BlocProvider<Menucubit>(
+                create: (BuildContext context) => Menucubit()),
           ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
