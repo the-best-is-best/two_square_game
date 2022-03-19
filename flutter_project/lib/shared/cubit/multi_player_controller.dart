@@ -244,7 +244,7 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
         sendData = {"message": "Room issue"};
 
         await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
-      } else {
+      } else if (_gameStarted) {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
