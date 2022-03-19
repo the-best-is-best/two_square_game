@@ -10,6 +10,7 @@ class Menucubit extends Cubit<MenuStates> {
 
   int boardSize = 4;
   String displayMode = "Easy";
+  bool multiClicked = false;
 
   void changeMode(String mode) {
     if (mode == displayMode) {
@@ -27,5 +28,10 @@ class Menucubit extends Cubit<MenuStates> {
     }
     log(displayMode);
     emit(ChangeMode());
+  }
+
+  void multiPlayerClick(bool clicked) {
+    multiClicked = clicked;
+    emit(MultiPlayerClicked());
   }
 }

@@ -46,6 +46,7 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance!.removeObserver(this);
+
     super.dispose();
   }
 
@@ -60,6 +61,8 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
           cubit.makeOrJoinRoom(widget.boardSize);
           return BlocConsumer<MultiPlayercubit, MultiPlyerStates>(
             listener: (BuildContext context, MultiPlyerStates state) async {
+              BotToast.closeAllLoading();
+
               if (state is UpdateGameAlert) {
                 BotToast.showText(text: "Please Update Game");
                 cubit.logout();
@@ -103,10 +106,8 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                     meesage: "You Lost The Game",
                     multiplayer: true);
                 messageDialog.show(context, barrierDismissible: false);
-              } else if (state is StopTime) {
-                cubit.stopTime(cubitCountdownTimer!);
               } else if (state is StartTime) {
-                cubit.startTime(cubitCountdownTimer!);
+                cubit.startTime(cubitCountdownTimer);
               } else if (state is RoomError) {
                 MessageDialog messageDialog = customDialog(
                     title: 'Alert',
@@ -114,6 +115,16 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                     meesage: "Room error",
                     multiplayer: true);
                 messageDialog.show(context, barrierDismissible: false);
+              } else if (state is FirebaseError) {
+                cubit.logout();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => const Menu(),
+                  ),
+                  (route) => false,
+                );
+                BotToast.showText(text: "Try Again");
               }
             },
             builder: (BuildContext context, MultiPlyerStates state) {

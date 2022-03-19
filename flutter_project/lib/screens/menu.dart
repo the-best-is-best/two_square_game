@@ -1,19 +1,24 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:buildcondition/buildcondition.dart';
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_api_availability/google_api_availability.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:tbib_style/tbib_style.dart';
 import 'package:two_square_game/screens/game.dart';
 import 'package:two_square_game/screens/how_to_play.dart';
 import 'package:two_square_game/screens/multiplayer.dart';
+import 'package:two_square_game/shared/services/alert_google_services.dart';
+import 'package:two_square_game/shared/services/firebase_services.dart';
 import '../shared/ads/my_banner_ad.dart';
 import '../shared/components.dart/app_bar.dart';
 import '../shared/components.dart/push_page.dart';
 import '../shared/ads/interstitial_ad.dart';
 import '../shared/cubit/menu_controller.dart';
 import '../shared/cubit/states/menu_states.dart';
+import '../shared/services/check_internet.dart';
 import '../shared/util/device_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -47,36 +52,34 @@ class _MenuState extends State<Menu> {
         child: Builder(builder: (context) {
           Menucubit cubit = Menucubit.get(context);
 
-          return Padding(
-            padding: const EdgeInsets.only(top: 20.0),
-            child: SizedBox(
-              width: size.width,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Image.asset(
-                      "assets/img/game-icon.png",
-                      height: 150,
+          return BlocConsumer<Menucubit, MenuStates>(
+            listener: (BuildContext context, MenuStates state) {},
+            builder: (BuildContext context, MenuStates state) => Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: SizedBox(
+                width: size.width,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Image.asset(
+                        "assets/img/game-icon.png",
+                        height: 150,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20.0),
-                    child: Text("Choose 2 Squares", style: TBIBFontStyle.h4),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 250.w,
-                          height: 55.h,
-                          child: BlocConsumer<Menucubit, MenuStates>(
-                            listener:
-                                (BuildContext context, MenuStates state) {},
-                            builder: (BuildContext context, MenuStates state) =>
-                                DropdownButton<String>(
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Text("Choose 2 Squares", style: TBIBFontStyle.h4),
+                    ),
+                    Expanded(
+                      flex: 4,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 250.w,
+                            height: 55.h,
+                            child: DropdownButton<String>(
                               value: cubit.displayMode,
                               style: TBIBFontStyle.h1,
                               iconSize: 45.h,
@@ -119,114 +122,146 @@ class _MenuState extends State<Menu> {
                                     }).toList(),
                             ),
                           ),
-                        ),
-                        const Padding(padding: EdgeInsets.only(top: 20)),
-                        SizedBox(
-                          height: 50.h,
-                          width: 250.w,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              MyInterstitial.getAd();
-                              MyBannerAd.checkAdLoaded();
-                              push(
-                                context: context,
-                                widget: Game(cubit.boardSize),
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "Play",
-                                style: TBIBFontStyle.h3,
-                              ),
-                            ),
-                          ),
-                        ),
-                        BuildCondition(
-                            condition: DeviceType.isSmallScreen(),
-                            builder: (_) => const SizedBox(),
-                            fallback: (_) => const Padding(
-                                padding: EdgeInsets.only(top: 20))),
-                        BuildCondition(
-                          condition: DeviceType.isSmallScreen(),
-                          builder: (_) => const SizedBox(),
-                          fallback: (_) => SizedBox(
+                          const Padding(padding: EdgeInsets.only(top: 20)),
+                          SizedBox(
                             height: 50.h,
                             width: 250.w,
                             child: ElevatedButton(
-                              onPressed: () async {
-                                MyBannerAd.checkAdLoaded();
-                                pushReplacementAll(
-                                  context: context,
-                                  widget: MultiPlayer(cubit.boardSize),
-                                );
-                              },
+                              onPressed: cubit.multiClicked
+                                  ? null
+                                  : () async {
+                                      MyInterstitial.getAd();
+                                      MyBannerAd.checkAdLoaded();
+                                      push(
+                                        context: context,
+                                        widget: Game(cubit.boardSize),
+                                      );
+                                    },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "Play",
+                                  style: TBIBFontStyle.h3,
+                                ),
+                              ),
+                            ),
+                          ),
+                          BuildCondition(
+                              condition: DeviceType.isSmallScreen(),
+                              builder: (_) => const SizedBox(),
+                              fallback: (_) => const Padding(
+                                  padding: EdgeInsets.only(top: 20))),
+                          BuildCondition(
+                            condition: DeviceType.isSmallScreen(),
+                            builder: (_) => const SizedBox(),
+                            fallback: (_) => SizedBox(
+                              height: 50.h,
+                              width: 250.w,
+                              child: ElevatedButton(
+                                onPressed: cubit.multiClicked
+                                    ? null
+                                    : () async {
+                                        cubit.multiPlayerClick(true);
+                                        await CheckInternet.init();
+
+                                        if (CheckInternet.isConnected) {
+                                          await firebaseServices(
+                                              GoogleServesesChecker
+                                                  .getPlaSytoreAvailability,
+                                              CheckInternet.isConnected);
+
+                                          MyBannerAd.checkAdLoaded();
+                                          cubit.multiPlayerClick(false);
+
+                                          pushReplacementAll(
+                                            context: context,
+                                            widget:
+                                                MultiPlayer(cubit.boardSize),
+                                          );
+                                        } else {
+                                          if (!CheckInternet.isConnected) {
+                                            BotToast.showText(
+                                                text: "No Internet Connection",
+                                                duration:
+                                                    const Duration(seconds: 5));
+                                          } else if (GoogleServesesChecker
+                                                  .getPlaSytoreAvailability !=
+                                              GooglePlayServicesAvailability
+                                                  .success) {
+                                            GoogleServesesChecker
+                                                .alertGoogleServices();
+                                          }
+                                        }
+                                      },
+                                child: Text(
+                                  "Multiplayer",
+                                  style: TBIBFontStyle.h4,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const Padding(padding: EdgeInsets.only(top: 20)),
+                          SizedBox(
+                            height: 50.h,
+                            width: 250.w,
+                            child: ElevatedButton(
+                              onPressed: cubit.multiClicked
+                                  ? null
+                                  : () async {
+                                      push(
+                                        context: context,
+                                        widget: const HowToPlay(),
+                                      );
+                                    },
                               child: Text(
-                                "Multiplayer",
+                                "How To Play",
                                 style: TBIBFontStyle.h4,
                               ),
                             ),
                           ),
-                        ),
-                        const Padding(padding: EdgeInsets.only(top: 20)),
-                        SizedBox(
-                          height: 50.h,
-                          width: 250.w,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              push(
-                                context: context,
-                                widget: const HowToPlay(),
-                              );
-                            },
-                            child: Text(
-                              "How To Play",
-                              style: TBIBFontStyle.h4,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Align(
-                      alignment: DeviceType.isSmallScreen()
-                          ? Alignment.topLeft
-                          : Alignment.topCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Column(
-                          children: [
-                            DeviceType.isSmallScreen()
-                                ? const Padding(
-                                    padding: EdgeInsets.only(top: 30))
-                                : const Padding(
-                                    padding: EdgeInsets.only(top: 50)),
-                            Text(
-                              "Special Thanks :",
-                              style: TBIBFontStyle.h3,
-                            ),
-                            const Padding(padding: EdgeInsets.only(top: 12)),
-                            Text(
-                              "Michelle Raouf",
-                              style: DeviceType.isLargeScreen()
-                                  ? TBIBFontStyle.h4
-                                  : TBIBFontStyle.h5,
-                            ),
-                            //    const Padding(padding: EdgeInsets.only(top: 12)),
-                            Text(
-                              "John Raouf",
-                              style: DeviceType.isLargeScreen()
-                                  ? TBIBFontStyle.h4
-                                  : TBIBFontStyle.h5,
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
-                  )
-                ],
+                    Expanded(
+                      flex: 2,
+                      child: Align(
+                        alignment: DeviceType.isSmallScreen()
+                            ? Alignment.topLeft
+                            : Alignment.topCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Column(
+                            children: [
+                              DeviceType.isSmallScreen()
+                                  ? const Padding(
+                                      padding: EdgeInsets.only(top: 30))
+                                  : const Padding(
+                                      padding: EdgeInsets.only(top: 50)),
+                              Text(
+                                "Special Thanks :",
+                                style: TBIBFontStyle.h3,
+                              ),
+                              const Padding(padding: EdgeInsets.only(top: 12)),
+                              Text(
+                                "Michelle Raouf",
+                                style: DeviceType.isLargeScreen()
+                                    ? TBIBFontStyle.h4
+                                    : TBIBFontStyle.h5,
+                              ),
+                              //    const Padding(padding: EdgeInsets.only(top: 12)),
+                              Text(
+                                "John Raouf",
+                                style: DeviceType.isLargeScreen()
+                                    ? TBIBFontStyle.h4
+                                    : TBIBFontStyle.h5,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           );

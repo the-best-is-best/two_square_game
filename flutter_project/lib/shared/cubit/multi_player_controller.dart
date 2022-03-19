@@ -67,7 +67,6 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
     var data = response.data;
     String message = data['messages'][0];
     Map<String, String>? serverData;
-    debugPrint(message);
     if (message.contains("Please Update Game First")) {
       emit(UpdateGameAlert());
       return;
@@ -82,7 +81,12 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
       _idRoom = int.parse(serverData['id']!);
       _turn = 1;
 
-      await FirebaseMessaging.instance.subscribeToTopic("room_$_idRoom");
+      try {
+        await FirebaseMessaging.instance.subscribeToTopic("room_$_idRoom");
+      } catch (_) {
+        emit(FirebaseError());
+        return;
+      }
       await Future.delayed(const Duration(milliseconds: 500));
 
       if (message == "Room Created") {
@@ -170,13 +174,10 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
     BotToast.closeAllLoading();
   }
 
-  void stopTime(CountdownTimerController timercubit) {
-    timercubit.disposeTimer();
-    emit(StopTime());
-  }
-
-  void startTime(CountdownTimerController timercubit) {
-    timercubit.start();
+  void startTime(CountdownTimerController? timercubit) async {
+    if (timercubit != null) {
+      await timercubit.start();
+    }
     emit(GameReady());
   }
 
@@ -190,21 +191,29 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
   }
 
   void getBoard(int playerTurn) async {
-    if (playerTurn == _player) {
-      BotToast.showLoading();
-      Map<String, String> data = {"roomId": "$_idRoom", "message": "Get Data"};
+    try {
+      if (playerTurn == _player) {
+        BotToast.showLoading();
+        Map<String, String> data = {
+          "roomId": "$_idRoom",
+          "message": "Get Data"
+        };
 
-      var response = await DioHelper.postData(
-          url: "controller/control_room.php", query: data);
-      _turn = _turn == 1 ? 2 : 1;
-      board = jsonDecode(response.data['data']['board']);
-      BotToast.closeAllLoading();
-      Map sendData = {"message": "Start Time"};
-      await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
-      emit(GameReady());
-    } else {
-      _turn = _turn == 1 ? 2 : 1;
-      emit(GameReady());
+        var response = await DioHelper.postData(
+            url: "controller/control_room.php", query: data);
+        _turn = _turn == 1 ? 2 : 1;
+        board = jsonDecode(response.data['data']['board']);
+
+        Map sendData = {"message": "Start Time"};
+        await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
+        BotToast.closeAllLoading();
+        emit(GameReady());
+      } else {
+        _turn = _turn == 1 ? 2 : 1;
+        emit(GameReady());
+      }
+    } catch (_) {
+      emit(RoomError());
     }
   }
 
@@ -225,14 +234,24 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
         } else {
           sendData = {"message": "player win 1"};
         }
-        emit(LogoutGame());
 
         await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
+        try {
+          emit(LogoutGame());
+        } catch (_) {}
       } else if (_gameStarted && _roomError) {
         Map sendData = {};
         sendData = {"message": "Room issue"};
 
         await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
+      } else {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => const Menu(),
+          ),
+          (route) => false,
+        );
       }
 
       await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");

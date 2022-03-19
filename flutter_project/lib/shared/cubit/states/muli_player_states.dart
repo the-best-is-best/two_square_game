@@ -6,6 +6,8 @@ class ServerError extends MultiPlyerStates {}
 
 class RoomError extends MultiPlyerStates {}
 
+class FirebaseError extends MultiPlyerStates {}
+
 class UpdateGameAlert extends MultiPlyerStates {}
 
 class WaitingPlayer extends MultiPlyerStates {}
