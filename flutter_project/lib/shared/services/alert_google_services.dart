@@ -9,7 +9,7 @@ class GoogleServesesChecker {
   static init() async {
     try {
       getPlaSytoreAvailability = await GoogleApiAvailability.instance
-          .checkGooglePlayServicesAvailability(true);
+          .checkGooglePlayServicesAvailability();
     } on PlatformException {
       getPlaSytoreAvailability = GooglePlayServicesAvailability.unknown;
     }

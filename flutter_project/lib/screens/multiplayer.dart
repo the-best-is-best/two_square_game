@@ -61,8 +61,6 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
           cubit.makeOrJoinRoom(widget.boardSize);
           return BlocConsumer<MultiPlayercubit, MultiPlyerStates>(
             listener: (BuildContext context, MultiPlyerStates state) async {
-              BotToast.closeAllLoading();
-
               if (state is UpdateGameAlert) {
                 BotToast.showText(text: "Please Update Game");
                 cubit.logout();
@@ -78,6 +76,8 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
               } else if (state is YouCannotPlayHere) {
                 BotToast.showText(text: "you can't play here");
               } else if (state is DrawGame) {
+                BotToast.closeAllLoading();
+
                 MessageDialog messageDialog = customDialog(
                     title: 'Alert',
                     context: context,
@@ -86,6 +86,8 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
 
                 messageDialog.show(context, barrierDismissible: false);
               } else if (state is EndGame) {
+                BotToast.closeAllLoading();
+
                 String info = cubit.playerWin == 0
                     ? "No One Win The Game"
                     : cubit.playerWin == null
@@ -100,6 +102,8 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                     multiplayer: true);
                 messageDialog.show(context, barrierDismissible: false);
               } else if (state is LogoutGame) {
+                BotToast.closeAllLoading();
+
                 MessageDialog messageDialog = customDialog(
                     title: 'Alert',
                     context: context,
@@ -109,6 +113,8 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
               } else if (state is StartTime) {
                 cubit.startTime(cubitCountdownTimer);
               } else if (state is RoomError) {
+                BotToast.closeAllLoading();
+
                 MessageDialog messageDialog = customDialog(
                     title: 'Alert',
                     context: context,
@@ -116,6 +122,8 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                     multiplayer: true);
                 messageDialog.show(context, barrierDismissible: false);
               } else if (state is FirebaseError) {
+                BotToast.closeAllLoading();
+
                 cubit.logout();
                 Navigator.pushAndRemoveUntil(
                   context,

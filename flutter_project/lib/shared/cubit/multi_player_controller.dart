@@ -114,6 +114,7 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
     if (num == _number1) {
       return;
     }
+    BotToast.showLoading();
     _number2 ??= num;
     _played(_number1!, _number2!);
 
@@ -121,7 +122,6 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
   }
 
   void _played(int num1, int num2) async {
-    BotToast.showLoading();
     Map<String, String> data = {
       "roomId": "$_idRoom",
       "playerId": "$_player",
@@ -161,14 +161,19 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
 
         endGame(_player);
         emit(EndGame());
+        log("Player Win");
       } else {
         _roomError = true;
         emit(RoomError());
+        log("server not applied");
+
         logout();
       }
-    } catch (_) {
+    } catch (ex) {
       _roomError = true;
       emit(RoomError());
+      log("server not applied 1 ${ex.toString()}");
+
       logout();
     }
     BotToast.closeAllLoading();
@@ -212,8 +217,9 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
         _turn = _turn == 1 ? 2 : 1;
         emit(GameReady());
       }
-    } catch (_) {
+    } catch (ex) {
       emit(RoomError());
+      log("server not applied 2 =${ex.toString()}");
     }
   }
 
@@ -244,14 +250,6 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
         sendData = {"message": "Room issue"};
 
         await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
-      } else if (_gameStarted) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => const Menu(),
-          ),
-          (route) => false,
-        );
       }
 
       await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");

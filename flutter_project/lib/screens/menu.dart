@@ -164,14 +164,17 @@ class _MenuState extends State<Menu> {
                                         cubit.multiPlayerClick(true);
                                         await CheckInternet.init();
 
-                                        if (CheckInternet.isConnected) {
+                                        if (CheckInternet.isConnected &&
+                                            GoogleServesesChecker
+                                                    .getPlaSytoreAvailability ==
+                                                GooglePlayServicesAvailability
+                                                    .success) {
                                           await firebaseServices(
                                               GoogleServesesChecker
                                                   .getPlaSytoreAvailability,
                                               CheckInternet.isConnected);
 
                                           MyBannerAd.checkAdLoaded();
-                                          cubit.multiPlayerClick(false);
 
                                           pushReplacementAll(
                                             context: context,
@@ -192,6 +195,7 @@ class _MenuState extends State<Menu> {
                                                 .alertGoogleServices();
                                           }
                                         }
+                                        cubit.multiPlayerClick(false);
                                       },
                                 child: Text(
                                   "Multiplayer",
