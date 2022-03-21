@@ -11,7 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_api_availability/google_api_availability.dart';
-import 'package:simple_connection_checker/simple_connection_checker.dart';
 import 'package:tbib_style/tbib_style.dart';
 import 'package:two_square_game/screens/splash_screen.dart';
 import 'package:two_square_game/shared/cubit/menu_controller.dart';
@@ -68,8 +67,6 @@ Future<void> main() async {
       MultiPlayercubit cubit = MultiPlayercubit.get(MultiPlayercubit.context);
 
       if (mapMessage['message'] == "joined") {
-        cubit.countdownTimerTurn =
-            DateTime.now().millisecondsSinceEpoch + 1000 * 30;
         cubit.playerJoined();
       } else if (mapMessage['message'] == "player win 1") {
         cubit.endGame(1);
@@ -79,8 +76,6 @@ Future<void> main() async {
         cubit.endGame(0);
       } else if (mapMessage['message'].toString().contains("Get Data Player")) {
         List messageData = mapMessage['message'].toString().split('-');
-        cubit.countdownTimerTurn =
-            DateTime.now().millisecondsSinceEpoch + 1000 * 30;
         int playerId = int.parse(messageData[1]);
         cubit.getBoard(playerId);
       } else if (mapMessage['message'].toString().contains("Player Win")) {
@@ -90,7 +85,7 @@ Future<void> main() async {
       } else if (mapMessage['message'].toString() == "Start Time") {
         cubit.firebaseStartTime();
       } else if (mapMessage['message'] == "Room issue") {
-        cubit.endGame(0);
+        cubit.roomIssue();
       }
     }
   });
@@ -112,14 +107,13 @@ class _MyAppState extends State<MyApp> {
   Future<void> firebaseError() async {}
 
   Future<void> _testAsyncErrorOnInit() async {
-    Future<void>.delayed(const Duration(seconds: 2), () {
-      final List<int> list = <int>[];
-    });
+    Future<void>.delayed(const Duration(seconds: 2), () {});
   }
 
   // Define an async function to initialize FlutterFire
   Future<void> _initializeFlutterFire() async {
     // Wait for Firebase to initialize
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
     if (_kTestingCrashlytics) {
       // Force enable crashlytics collection enabled if we're testing it.

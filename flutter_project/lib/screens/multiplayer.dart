@@ -3,9 +3,9 @@ import 'package:buildcondition/buildcondition.dart';
 import 'package:dialogs/dialogs/message_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
-import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:tbib_style/style/font_style.dart';
+import 'package:timer_count_down/timer_controller.dart';
+import 'package:timer_count_down/timer_count_down.dart';
 import 'package:two_square_game/shared/components.dart/app_bar.dart';
 
 import '../shared/components.dart/back_clicked.dart';
@@ -25,7 +25,8 @@ class MultiPlayer extends StatefulWidget {
 }
 
 class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
-  CountdownTimerController? cubitCountdownTimer;
+  CountdownController cubitCountdownTimer =
+      CountdownController(autoStart: true);
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -112,6 +113,8 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                 messageDialog.show(context, barrierDismissible: false);
               } else if (state is StartTime) {
                 cubit.startTime(cubitCountdownTimer);
+              } else if (state is StopTime) {
+                cubit.stopTime(cubitCountdownTimer);
               } else if (state is RoomError) {
                 BotToast.closeAllLoading();
 
@@ -162,15 +165,19 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  BuildCondition(
-                                    condition: cubit.countdownTimerTurn != null,
-                                    builder: (_) => CountdownTimer(
+                                  Builder(builder: (context) {
+                                    return Countdown(
                                       controller: cubitCountdownTimer,
-                                      onEnd: cubit.timeOut,
-                                      endTime: cubit.countdownTimerTurn,
-                                      textStyle: TBIBFontStyle.b1,
-                                    ),
-                                  ),
+                                      onFinished: cubit.timeOut,
+                                      build:
+                                          (BuildContext context, double time) =>
+                                              Text(
+                                        " ${time.round()} ",
+                                        style: TBIBFontStyle.b1,
+                                      ),
+                                      seconds: cubit.countdownTimerTurn,
+                                    );
+                                  }),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 12.0),
