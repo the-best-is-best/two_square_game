@@ -83,6 +83,7 @@ Future<void> main() async {
         int playerId = int.parse(messageData[1]);
         cubit.endGame(playerId);
       } else if (mapMessage['message'].toString() == "Start Time") {
+        cubit.countdownTimerTurn = 30;
         cubit.firebaseStartTime();
       } else if (mapMessage['message'] == "Room issue") {
         cubit.roomIssue();

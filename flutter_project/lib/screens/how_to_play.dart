@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tbib_style/style/font_style.dart';
-import 'package:video_player/video_player.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../shared/components.dart/app_bar.dart';
 
@@ -13,31 +13,22 @@ class HowToPlay extends StatefulWidget {
 }
 
 class _HowToPlayState extends State<HowToPlay> {
-  final VideoPlayerController _videoPlayerController =
-      VideoPlayerController.asset("assets/video/how-to-play.mp4");
+  final YoutubePlayerController _controllerYoutube = YoutubePlayerController(
+    initialVideoId: '51tBJRncZnI',
+    flags: const YoutubePlayerFlags(
+      autoPlay: false,
+    ),
+  );
 
   @override
   void initState() {
-    _videoPlayerController.setVolume(1);
-    _videoPlayerController.addListener(() {
-      setState(() {});
-    });
-    _videoPlayerController.initialize();
     super.initState();
   }
 
   @override
   void dispose() {
-    _videoPlayerController.dispose();
+    _controllerYoutube.dispose();
     super.dispose();
-  }
-
-  void _audioController() async {
-    if (_videoPlayerController.value.isPlaying) {
-      await _videoPlayerController.pause();
-    } else {
-      await _videoPlayerController.play();
-    }
   }
 
   @override
@@ -51,41 +42,16 @@ class _HowToPlayState extends State<HowToPlay> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _videoPlayerController.value.isInitialized
-                    ? SizedBox(
-                        width: 220.w,
-                        height: 520.h,
-                        child: AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: Stack(
-                            children: [
-                              VideoPlayer(_videoPlayerController),
-                              Align(
-                                alignment: Alignment.bottomCenter,
-                                child: Container(
-                                  width: 220.w,
-                                  height: 40.h,
-                                  color: Colors.grey.withOpacity(.5),
-                                  child: Align(
-                                    alignment: Alignment.centerRight,
-                                    child: IconButton(
-                                      onPressed: () => _audioController(),
-                                      icon: Icon(
-                                          _videoPlayerController.value.isPlaying
-                                              ? Icons.pause_circle
-                                              : Icons.play_circle,
-                                          size: 30.h,
-                                          color: const Color.fromRGBO(
-                                              206, 222, 235, .5)),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    : Container(),
+                SizedBox(
+                  height: 520.h,
+                  child: YoutubePlayer(
+                    controller: _controllerYoutube,
+                    showVideoProgressIndicator: true,
+                    bottomActions: const [],
+                    topActions: const [],
+                    aspectRatio: 16 / 9,
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20.0),
                   child: Text(

@@ -148,12 +148,12 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
       } else if (message == "Next Player") {
         _getBoardLocal(num1, num2);
         int nextTurn = _player == 1 ? 2 : 1;
-        countdownTimerTurn = 15;
+
+        emit(StopTime());
 
         Map sendData = {"message": "Get Data Player-$nextTurn"};
 
         await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
-        emit(StartTime());
       } else if (message == "Player Win") {
         Map sendData = {"message": "Player Win-$_player"};
         emit(StopTime());
@@ -187,7 +187,6 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
       _gameStarted = true;
       await time.start();
     } else {
-      countdownTimerTurn = 30;
       await time.restart();
 
       emit(GameReady());
@@ -212,7 +211,8 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
   }
 
   void getBoard(int playerTurn) async {
-    emit(StopTime());
+    countdownTimerTurn = 15;
+    emit(StartTime());
     try {
       if (playerTurn == _player) {
         BotToast.showLoading();
@@ -225,15 +225,12 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
             url: "controller/control_room.php", query: data);
 
         board = jsonDecode(response.data['data']['board']);
-        //_turn = _turn == 1 ? 2 : 1;
         Map sendData = {"message": "Start Time"};
         await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
         BotToast.closeAllLoading();
-        log("time started");
+
         emit(GameReady());
-        log("Get Board");
       } else {
-        //_turn = _turn == 1 ? 2 : 1;
         emit(GameReady());
         log("Not my Turn");
       }
@@ -247,12 +244,12 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
     if (_turn == _player) logout();
   }
 
-  void logout() async {
+  void logout({bool pleaseUpdate = false}) async {
     _closeAd();
     if (_idRoom != null) {
       await DioHelper.postData(
           url: "delete/room_delete.php", query: {"roomId": _idRoom});
-      if (!gameStareted()) {
+      if (!_gameStarted) {
         await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
         Navigator.pushAndRemoveUntil(
           context,
@@ -283,6 +280,14 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates>
 
         await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
       }
+    } else {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => const Menu(),
+        ),
+        (route) => false,
+      );
     }
   }
 
