@@ -57,32 +57,34 @@ if (isset($jsonData->boardSize) && !isset($jsonData->playerId)) {
         exit;
     }
 
-    if(!isset($jsonData->gameVersion)){
+    if (!isset($jsonData->gameVersion)) {
         $response = new Response();
         $response->setHttpStatusCode(400);
         $response->setSuccess(false);
-    
+
         $response->addMessage("You can't access link");
-    
+
         $response->send();
         exit;
-        
-    }else{
-        
-        if($jsonData->gameVersion < 2){
+    } else {
+
+        if ($jsonData->gameVersion < 8) {
             $response = new Response();
-        $response->setHttpStatusCode(400);
-        $response->setSuccess(false);
-    
-        $response->addMessage("Please Update Game First - your version is $jsonData->gameVersion");
-    
-        $response->send();
-        exit;
+            $response->setHttpStatusCode(400);
+            $response->setSuccess(false);
+
+            $response->addMessage("Please Update Game First - your version is $jsonData->gameVersion");
+
+            $response->send();
+            exit;
         }
     }
     $boardSize = trim($jsonData->boardSize);
-
-    $room->joinOrCreate($boardSize);
+    $numOfPlayer=2;
+    if(isset($jsonData->numOfPlayer)){
+    $numOfPlayer = trim($jsonData->numOfPlayer);
+    }
+    $room->joinOrCreate($boardSize, $numOfPlayer);
     $response = new Response();
     $response->setHttpStatusCode(400);
     $response->setSuccess(false);
@@ -94,23 +96,23 @@ if (isset($jsonData->boardSize) && !isset($jsonData->playerId)) {
 } else if (isset($jsonData->playerId) && !isset($jsonData->boardSize)) {
     if (!isset($jsonData->roomId) || !isset($jsonData->number1) || !isset($jsonData->number2)) {
     } else {
-        playController($jsonData->roomId,$jsonData->playerId,$jsonData->number1,$jsonData->number2);
+        playController($jsonData->roomId, $jsonData->playerId, $jsonData->number1, $jsonData->number2);
         return;
     }
 } else {
-    if(isset($jsonData->message)){
-      if($jsonData->message="Get Data"){
-        $room->getData($jsonData->roomId);
-        return;
-      }
-    }else{
-    $response = new Response();
-    $response->setHttpStatusCode(400);
-    $response->setSuccess(false);
+    if (isset($jsonData->message)) {
+        if ($jsonData->message = "Get Data") {
+            $room->getData($jsonData->roomId);
+            return;
+        }
+    } else {
+        $response = new Response();
+        $response->setHttpStatusCode(400);
+        $response->setSuccess(false);
 
-    $response->addMessage("You can't access link");
+        $response->addMessage("You can't access link");
 
-    $response->send();
-    exit;
+        $response->send();
+        exit;
     }
 }

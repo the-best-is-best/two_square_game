@@ -1,8 +1,8 @@
 <?php
 
-function  makeRooms($boardSize)
+function  makeRooms($boardSize, $numOfPlayer)
 {
-    
+
     try {
         $writeDB = DB::connectionWriteDB();
         $readDB = DB::connectionWriteDB();
@@ -16,7 +16,7 @@ function  makeRooms($boardSize)
         exit;
     }
 
-    $query = $writeDB->prepare('SELECT * FROM rooms_two_square_game ORDER BY id DESC LIMIT 1');
+    $query = $writeDB->prepare("SELECT id FROM rooms_two_square_game ORDER BY id DESC LIMIT 1 ");
     $query->execute();
     $row = $query->fetch();
     $id = 1;
@@ -30,10 +30,12 @@ function  makeRooms($boardSize)
         array_push($board, $i + 1);
     }
     $board =  json_encode($board);
-    $query = $writeDB->prepare('INSERT into rooms_two_square_game (id  , board , boardSize ,totalGameNum)
-    VALUES (:id , :board , :boardSize , :totalGameNum)');
+    $query = $writeDB->prepare('INSERT into rooms_two_square_game (id  ,numOfPlayer , board , boardSize ,totalGameNum)
+    VALUES (:id , :numOfPlayer ,:board , :boardSize , :totalGameNum)');
 
     $query->bindParam(':id', $id, PDO::PARAM_STR);
+    $query->bindParam(':numOfPlayer',  $numOfPlayer, PDO::PARAM_STR);
+
     $query->bindParam(':board',  $board, PDO::PARAM_STR);
     $query->bindParam(':boardSize', $boardSize, PDO::PARAM_STR);
     $query->bindParam(':totalGameNum', $totalGameNum, PDO::PARAM_STR);
@@ -49,10 +51,10 @@ function  makeRooms($boardSize)
         $response->send();
         exit;
     }
-    $query = $readDB->prepare("SELECT * FROM rooms_two_square_game ORDER BY id DESC LIMIT 1");
+    $query = $readDB->prepare("SELECT id , board FROM rooms_two_square_game ORDER BY id DESC LIMIT 1");
     $query->execute();
     $row = $query->fetch();
-
+    $row['yourId'] = 1;
     $response = new Response();
     $response->setHttpStatusCode(201);
     $response->setSuccess(true);
@@ -61,4 +63,3 @@ function  makeRooms($boardSize)
     $response->send();
     exit;
 }
-

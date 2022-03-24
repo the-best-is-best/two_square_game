@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 06, 2022 at 08:10 PM
+-- Generation Time: Mar 24, 2022 at 04:53 PM
 -- Server version: 10.4.21-MariaDB
 -- PHP Version: 7.4.25
 
@@ -24,13 +24,16 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `rooms`
+-- Table structure for table `rooms_two_square_game`
 --
 
-CREATE TABLE `rooms` (
+CREATE TABLE `rooms_two_square_game` (
   `id` int(11) NOT NULL,
+  `numOfPlayer` int(11) NOT NULL,
   `id_user1` int(11) NOT NULL DEFAULT 1,
   `id_user2` int(11) DEFAULT NULL,
+  `id_user3` int(11) DEFAULT NULL,
+  `id_user4` int(11) DEFAULT NULL,
   `started` tinyint(4) NOT NULL,
   `turn` int(11) NOT NULL DEFAULT 1,
   `board` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`board`)),
@@ -41,10 +44,10 @@ CREATE TABLE `rooms` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Table structure for table `users_two_square_game`
 --
 
-CREATE TABLE `users` (
+CREATE TABLE `users_two_square_game` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
@@ -56,15 +59,15 @@ CREATE TABLE `users` (
 --
 
 --
--- Indexes for table `rooms`
+-- Indexes for table `rooms_two_square_game`
 --
-ALTER TABLE `rooms`
+ALTER TABLE `rooms_two_square_game`
   ADD UNIQUE KEY `id` (`id`);
 
 --
--- Indexes for table `users`
+-- Indexes for table `users_two_square_game`
 --
-ALTER TABLE `users`
+ALTER TABLE `users_two_square_game`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
 
@@ -73,9 +76,9 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT for table `users_two_square_game`
 --
-ALTER TABLE `users`
+ALTER TABLE `users_two_square_game`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 

@@ -1,15 +1,55 @@
 <?php
 require_once '../delete/room_delete_end.php';
-function JoinRoom($writeDB, $id)
+function JoinRoom($writeDB, $id, $numOfPlayer, $user1, $user2, $user3, $user4)
 {
 
-    $query = $writeDB->prepare('UPDATE rooms_two_square_game SET started = :started , id_user2=:id_user2 WHERE id = :id ');
-    $started = 1;
-    $id_user2 = 2;
+    $query = $writeDB->prepare('UPDATE rooms_two_square_game SET started = :started ,id_user1 =:id_user1 , id_user2=:id_user2 ,id_user3=:id_user3 ,id_user4=:id_user4    WHERE id = :id ');
+
+    $id_user1 = $user1;
+    $id_user2 = $user2;
+    $id_user3 = $user3;
+    $id_user4 = $user4;
+
+    $my_userId=null;
+    $started = 0;
+    if ($user1 == null || $user1 == 0) {
+        $my_userId= $id_user1 = 1;
+    } else {
+        if ($user2 == null || $user2==0) {
+            if ($numOfPlayer == 2)
+                $started = 1;
+
+                $my_userId=   $id_user2 = 2;
+        } else {
+            if ($user3 == null  || $user3==0) {
+                if ($numOfPlayer == 3)
+                    $started = 1;
+
+                    $my_userId=    $id_user3 = 3;
+            } else {
+                if ($numOfPlayer == 4 )
+                    $started = 1;
+
+                    $my_userId= $id_user4 = 4;
+            }
+        }
+    }
+
+
     $query->bindParam(':id', $id, PDO::PARAM_STR);
     $query->bindParam(':started', $started, PDO::PARAM_STR);
+    $query->bindParam(':id_user1', $id_user1, PDO::PARAM_STR);
+
     $query->bindParam(':id_user2', $id_user2, PDO::PARAM_STR);
+    $query->bindParam(':id_user3', $id_user3, PDO::PARAM_STR);
+    $query->bindParam(':id_user4', $id_user4, PDO::PARAM_STR);
     $query->execute();
+
+    if ($started == 1)
+        return array("startGame" ,$my_userId );
+    else{
+        return array("",$my_userId);
+    }
 }
 function playController($id, $playerId, $action1, $action2)
 {
@@ -33,6 +73,7 @@ function playController($id, $playerId, $action1, $action2)
     $board = json_decode($row['board']);
     $boardSize = $row['boardSize'];
     $totalGameNum = $row['totalGameNum'];
+    $numOfPlayer = $row['numOfPlayer'];
     if ($playerId != $row['turn']) {
         // room destroyed
         deleteRoomEnd($id);
@@ -105,7 +146,7 @@ function playController($id, $playerId, $action1, $action2)
                 }
             }
             if ($draw == true) {
-            
+
                 deleteRoomEnd($id);
                 $response = new Response();
                 $response->setHttpStatusCode(201);
@@ -118,8 +159,12 @@ function playController($id, $playerId, $action1, $action2)
                 $board =  json_encode($board);
 
                 $query = $writeDB->prepare('UPDATE rooms_two_square_game SET turn = :turn , board= :board WHERE id = :id ');
-                $turn = $row['turn'] == 1 ? 2 : 1;
-
+                $turn = $row['turn'];
+                if ($turn == $numOfPlayer) {
+                    $turn = 1;
+                } else {
+                    $turn++;
+                }
                 $query->bindParam(':id', $id, PDO::PARAM_STR);
                 $query->bindParam(':turn', $turn, PDO::PARAM_STR);
                 $query->bindParam(':board', $board, PDO::PARAM_STR);
@@ -132,7 +177,7 @@ function playController($id, $playerId, $action1, $action2)
                 $response->send();
                 exit;
             } else {
-                
+
                 deleteRoomEnd($id);
                 $response = new Response();
                 $response->setHttpStatusCode(201);

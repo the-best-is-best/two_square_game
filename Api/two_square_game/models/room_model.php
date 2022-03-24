@@ -3,9 +3,9 @@ require_once '../get_data/get_rooms.php';
 require_once '../insert_data/create_room.php';
 class RoomModel{
     
-    function joinOrCreate( $boardSize ){
+    function joinOrCreate( $boardSize , $numberOfPlayer ){
         
-        joinOrCreateRooms($boardSize);
+        joinOrCreateRooms($boardSize , $numberOfPlayer);
         
     }
 
@@ -13,8 +13,6 @@ class RoomModel{
         GetDataRoom($id);
     }
 
-    function  makeRoom( $boardSize){
-       makeRooms($boardSize);   
-    }
+  
 
 }
