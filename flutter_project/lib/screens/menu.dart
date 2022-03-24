@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'package:wakelock/wakelock.dart';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:buildcondition/buildcondition.dart';
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
@@ -10,10 +13,13 @@ import 'package:tbib_style/tbib_style.dart';
 import 'package:two_square_game/screens/game.dart';
 import 'package:two_square_game/screens/how_to_play.dart';
 import 'package:two_square_game/screens/multiplayer.dart';
+import 'package:two_square_game/shared/cubit/game_controller.dart';
+import 'package:two_square_game/shared/cubit/multi_player_controller.dart';
 import 'package:two_square_game/shared/services/alert_google_services.dart';
 import 'package:two_square_game/shared/services/firebase_services.dart';
 import '../shared/ads/my_banner_ad.dart';
 import '../shared/components.dart/app_bar.dart';
+import '../shared/components.dart/custom_dialog.dart';
 import '../shared/components.dart/push_page.dart';
 import '../shared/ads/interstitial_ad.dart';
 import '../shared/cubit/menu_controller.dart';
@@ -59,6 +65,8 @@ class _MenuState extends State<Menu> {
               child: SizedBox(
                 width: size.width,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Expanded(
                       child: Image.asset(
@@ -130,12 +138,21 @@ class _MenuState extends State<Menu> {
                               onPressed: cubit.multiClicked
                                   ? null
                                   : () async {
-                                      MyInterstitial.getAd();
-                                      MyBannerAd.checkAdLoaded();
-                                      push(
-                                        context: context,
-                                        widget: Game(cubit.boardSize),
-                                      );
+                                      if (cubit.displayMode == "Easy") {
+                                        MyInterstitial.getAd();
+                                        MyBannerAd.checkAdLoaded();
+                                        push(
+                                          context: context,
+                                          widget: Game(cubit.boardSize, 2),
+                                        );
+                                      } else {
+                                        log(cubit.boardSize.toString());
+                                        askManyPlayer(
+                                            cubit: cubit,
+                                            cubitGame: Gamecubit(),
+                                            context: context,
+                                            gameMode: cubit.displayMode);
+                                      }
                                     },
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -161,39 +178,51 @@ class _MenuState extends State<Menu> {
                                 onPressed: cubit.multiClicked
                                     ? null
                                     : () async {
+                                        await Wakelock.enable();
                                         cubit.multiPlayerClick(true);
                                         await CheckInternet.init();
-
-                                        if (CheckInternet.isConnected &&
-                                            GoogleServesesChecker
-                                                    .getPlaSytoreAvailability ==
-                                                GooglePlayServicesAvailability
-                                                    .success) {
-                                          await firebaseServices(
+                                        if (FirebaseInit.token == null) {
+                                          if (CheckInternet.isConnected &&
                                               GoogleServesesChecker
-                                                  .getPlaSytoreAvailability,
-                                              CheckInternet.isConnected);
+                                                      .getPlaSytoreAvailability ==
+                                                  GooglePlayServicesAvailability
+                                                      .success) {
+                                            await FirebaseInit.firebaseServices(
+                                                GoogleServesesChecker
+                                                    .getPlaSytoreAvailability,
+                                                CheckInternet.isConnected);
 
-                                          MyBannerAd.checkAdLoaded();
-
-                                          pushReplacementAll(
-                                            context: context,
-                                            widget:
-                                                MultiPlayer(cubit.boardSize),
-                                          );
+                                            MyBannerAd.checkAdLoaded();
+                                          }
                                         } else {
                                           if (!CheckInternet.isConnected) {
                                             BotToast.showText(
                                                 text: "No Internet Connection",
                                                 duration:
                                                     const Duration(seconds: 5));
+                                            return;
                                           } else if (GoogleServesesChecker
                                                   .getPlaSytoreAvailability !=
                                               GooglePlayServicesAvailability
                                                   .success) {
                                             GoogleServesesChecker
                                                 .alertGoogleServices();
+                                            return;
                                           }
+                                        }
+                                        if (cubit.displayMode == "Easy") {
+                                          pushReplacementAll(
+                                            context: context,
+                                            widget:
+                                                MultiPlayer(cubit.boardSize, 2),
+                                          );
+                                        } else {
+                                          askManyPlayer(
+                                              context: context,
+                                              cubit: cubit,
+                                              isMulti: true,
+                                              cubitMulti: MultiPlayercubit(),
+                                              gameMode: cubit.displayMode);
                                         }
                                         cubit.multiPlayerClick(false);
                                       },

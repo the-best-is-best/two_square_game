@@ -1,6 +1,5 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:buildcondition/buildcondition.dart';
-import 'package:dialogs/dialogs/message_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tbib_style/style/font_style.dart';
@@ -17,8 +16,10 @@ import 'menu.dart';
 
 class MultiPlayer extends StatefulWidget {
   final int boardSize;
+  final int numberOfPlayer;
 
-  const MultiPlayer(this.boardSize, {Key? key}) : super(key: key);
+  const MultiPlayer(this.boardSize, this.numberOfPlayer, {Key? key})
+      : super(key: key);
 
   @override
   State<MultiPlayer> createState() => _MultiPlayerState();
@@ -33,7 +34,7 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
     //Do whatever you want in background
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
-      MultiPlayercubit cubit = MultiPlayercubit.get(MultiPlayercubit.context);
+      MultiPlayercubit cubit = MultiPlayercubit.get(MultiPlayercubit.context!);
       cubit.logout();
     }
   }
@@ -59,7 +60,13 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
         builder: (context) {
           MultiPlayercubit cubit = MultiPlayercubit.get(context);
           MultiPlayercubit.context = context;
-          cubit.makeOrJoinRoom(widget.boardSize);
+          Future.delayed(const Duration(milliseconds: 500)).then((value) {
+            if (MultiPlayercubit.context == null) {
+              cubit.logout();
+            }
+            cubit.makeOrJoinRoom(widget.boardSize, widget.numberOfPlayer);
+          });
+
           return BlocConsumer<MultiPlayercubit, MultiPlyerStates>(
             listener: (BuildContext context, MultiPlyerStates state) async {
               if (state is UpdateGameAlert) {
@@ -79,38 +86,38 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
               } else if (state is DrawGame) {
                 BotToast.closeAllLoading();
 
-                MessageDialog messageDialog = customDialog(
+                alertDialog(
                     title: 'Alert',
                     context: context,
                     meesage: "No one WIN the game",
                     multiplayer: true);
-
-                messageDialog.show(context, barrierDismissible: false);
               } else if (state is EndGame) {
                 BotToast.closeAllLoading();
 
-                String info = cubit.playerWin == 0
-                    ? "No One Win The Game"
-                    : cubit.playerWin == null
-                        ? "Room issue"
-                        : cubit.player() == cubit.playerWin
-                            ? "You Win The Game"
-                            : "You Lost The Game";
-                MessageDialog messageDialog = customDialog(
+                String info = cubit.playerLost == null
+                    ? cubit.playerWin == 0
+                        ? "No One Win The Game"
+                        : cubit.playerWin == null
+                            ? "Room issue"
+                            : cubit.player() == cubit.playerWin
+                                ? "You Win The Game"
+                                : "You Lost The Game"
+                    : cubit.playerLost != cubit.player()
+                        ? "You Win The Game"
+                        : "You Lost The Game";
+                alertDialog(
                     title: 'Alert',
                     context: context,
                     meesage: info,
                     multiplayer: true);
-                messageDialog.show(context, barrierDismissible: false);
               } else if (state is LogoutGame) {
                 BotToast.closeAllLoading();
 
-                MessageDialog messageDialog = customDialog(
+                alertDialog(
                     title: 'Alert',
                     context: context,
                     meesage: "You Lost The Game",
                     multiplayer: true);
-                messageDialog.show(context, barrierDismissible: false);
               } else if (state is StartTime) {
                 cubit.startTime(cubitCountdownTimer);
               } else if (state is StopTime) {
@@ -118,12 +125,11 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
               } else if (state is RoomError) {
                 BotToast.closeAllLoading();
 
-                MessageDialog messageDialog = customDialog(
+                alertDialog(
                     title: 'Alert',
                     context: context,
                     meesage: "Room error",
                     multiplayer: true);
-                messageDialog.show(context, barrierDismissible: false);
               } else if (state is FirebaseError) {
                 BotToast.closeAllLoading();
 
@@ -152,11 +158,15 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                     padding: const EdgeInsets.all(8.0),
                     child: BuildCondition(
                       condition:
-                          state is! WaitingPlayer && cubit.turn() != null,
+                          state is! WaitingPlayer && cubit.idRoom() != null,
                       builder: (_) {
-                        String turn = cubit.turn() == cubit.player()
-                            ? "Your Turn"
-                            : "Opponent's Turn";
+                        String turn = cubit.numberOfPlayer == 2
+                            ? cubit.turn() == cubit.player()
+                                ? "Your Turn"
+                                : "Opponent's Turn"
+                            : cubit.turn() == cubit.player()
+                                ? "Your Turn"
+                                : cubit.turn().toString();
                         return Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

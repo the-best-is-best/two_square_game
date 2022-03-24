@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:tbib_style/style/font_style.dart';
 
 import '../util/device_screen.dart';
@@ -13,7 +12,7 @@ void fontsServices() {
     TBIBFontStyle.h3 = TBIBFontStyle.h3.copyWith(fontWeight: FontWeight.w600);
   }
 
-  TBIBFontStyle.lisenGoogleFont(GoogleFonts.spaceMono());
+  TBIBFontStyle.addCustomFont("SpaceMono", null);
   TBIBFontStyle.h4 = TBIBFontStyle.h4.copyWith(
     color: const Color.fromRGBO(206, 222, 235, .5),
   );

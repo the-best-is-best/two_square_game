@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -33,25 +34,83 @@ const _kTestingCrashlytics = true;
 Future<void> main() async {
   await runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     await CheckInternet.init();
     await GoogleServesesChecker.init();
-    await firebaseServices(GoogleServesesChecker.getPlaSytoreAvailability,
+    await FirebaseInit.firebaseServices(
+        GoogleServesesChecker.getPlaSytoreAvailability,
         CheckInternet.isConnected);
-    await MobileAds.instance.initialize();
+
+    MobileAds.instance.initialize();
+
     DeviceType();
     fontsServices();
     DioHelper();
+
     if (GoogleServesesChecker.getPlaSytoreAvailability ==
             GooglePlayServicesAvailability.success &&
         CheckInternet.isConnected) {
       FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
     }
+
     BlocOverrides.runZoned(
       () {
         runApp(const MyApp());
       },
       blocObserver: MyBlocObserver(),
     );
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      Map? mapMessage;
+      mapMessage = json.decode(message.data['listen']);
+      log("firebase message listen");
+      if (mapMessage != null && mapMessage['message'] != null) {
+        if (MultiPlayercubit.context != null) {
+          MultiPlayercubit cubit =
+              MultiPlayercubit.get(MultiPlayercubit.context!);
+
+          if (mapMessage['message'] == "joined") {
+            cubit.playerJoined();
+          } else if (mapMessage['message'].toString().contains("player win")) {
+            int playerWin = int.parse(mapMessage['message']
+                [mapMessage['message'].toString().length - 1]);
+            cubit.endGame(playerWin);
+          } else if (mapMessage['message'].toString().contains("player lost")) {
+            int playerLost = int.parse(mapMessage['message']
+                [mapMessage['message'].toString().length - 1]);
+            cubit.lostPlayer(playerLost);
+          } else if (mapMessage['message'] == "No One Win The Game") {
+            cubit.endGame(0);
+          } else if (mapMessage['message']
+              .toString()
+              .contains("Get Data Player")) {
+            log("get Board");
+            int player = int.parse(mapMessage['message']
+                [mapMessage['message'].toString().length - 1]);
+            cubit.getBoard(player);
+          } else if (mapMessage['message'].toString().contains("Player Win")) {
+            List messageData = mapMessage['message'].toString().split('-');
+            int playerId = int.parse(messageData[1]);
+            cubit.endGame(playerId);
+          } else if (mapMessage['message'].toString() == "Start Time") {
+            cubit.countdownTimerTurn = 30;
+            cubit.firebaseStartTime();
+          } else if (mapMessage['message'] == "Room issue") {
+            cubit.roomIssue();
+          } else {
+            log("i got nothing, message : " + mapMessage['message'].toString());
+          }
+        } else {
+          log("Page null");
+          MultiPlayercubit cubit =
+              MultiPlayercubit.get(MultiPlayercubit.context!);
+          cubit.logout();
+        }
+      } else {
+        log("Message null ");
+      }
+    });
   }, (error, stackTrace) {
     if (GoogleServesesChecker.getPlaSytoreAvailability ==
             GooglePlayServicesAvailability.success &&
@@ -59,39 +118,6 @@ Future<void> main() async {
       FirebaseCrashlytics.instance.recordError(error, stackTrace);
     }
   });
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    Map? mapMessage;
-    mapMessage = json.decode(message.data['listen']);
-
-    if (mapMessage != null && mapMessage['message'] != null) {
-      MultiPlayercubit cubit = MultiPlayercubit.get(MultiPlayercubit.context);
-
-      if (mapMessage['message'] == "joined") {
-        cubit.playerJoined();
-      } else if (mapMessage['message'] == "player win 1") {
-        cubit.endGame(1);
-      } else if (mapMessage['message'] == "player win 2") {
-        cubit.endGame(2);
-      } else if (mapMessage['message'] == "No One Win The Game") {
-        cubit.endGame(0);
-      } else if (mapMessage['message'].toString().contains("Get Data Player")) {
-        List messageData = mapMessage['message'].toString().split('-');
-        int playerId = int.parse(messageData[1]);
-        cubit.getBoard(playerId);
-      } else if (mapMessage['message'].toString().contains("Player Win")) {
-        List messageData = mapMessage['message'].toString().split('-');
-        int playerId = int.parse(messageData[1]);
-        cubit.endGame(playerId);
-      } else if (mapMessage['message'].toString() == "Start Time") {
-        cubit.countdownTimerTurn = 30;
-        cubit.firebaseStartTime();
-      } else if (mapMessage['message'] == "Room issue") {
-        cubit.roomIssue();
-      }
-    }
-  });
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 }
 
 class MyApp extends StatefulWidget {
@@ -108,7 +134,10 @@ class _MyAppState extends State<MyApp> {
   Future<void> firebaseError() async {}
 
   Future<void> _testAsyncErrorOnInit() async {
-    Future<void>.delayed(const Duration(seconds: 2), () {});
+    Future<void>.delayed(const Duration(seconds: 2), () {
+      final List<int> list = <int>[];
+      debugPrint(list[100].toString());
+    });
   }
 
   // Define an async function to initialize FlutterFire

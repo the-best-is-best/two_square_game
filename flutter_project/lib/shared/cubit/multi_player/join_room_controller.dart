@@ -3,7 +3,7 @@ mixin JoinRoomcubit {
     if (data != null) {
       Map<String, String> returnData = {
         "id": data['id'].toString(),
-        "player": data['id_user2'].toString(),
+        "player": data['yourId'].toString(),
         "board": data['board'],
       };
 

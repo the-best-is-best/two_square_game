@@ -16,6 +16,8 @@ class GameReady extends MultiPlyerStates {}
 
 class LogoutGame extends MultiPlyerStates {}
 
+class PlayerOut extends MultiPlyerStates {}
+
 class EndGame extends MultiPlyerStates {}
 
 class SelectedNumber extends MultiPlyerStates {}

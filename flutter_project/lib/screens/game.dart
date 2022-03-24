@@ -1,6 +1,5 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:buildcondition/buildcondition.dart';
-import 'package:dialogs/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tbib_style/tbib_style.dart';
@@ -13,7 +12,9 @@ import '../shared/cubit/states/game_states.dart';
 
 class Game extends StatefulWidget {
   final int boardSize;
-  const Game(this.boardSize, {Key? key}) : super(key: key);
+  final int numberOfPlayer;
+
+  const Game(this.boardSize, this.numberOfPlayer, {Key? key}) : super(key: key);
 
   @override
   State<Game> createState() => _GameState();
@@ -31,7 +32,7 @@ class _GameState extends State<Game> {
           child: Builder(builder: (context) {
             Gamecubit cubit = Gamecubit.get(context);
             cubit.boardSize = widget.boardSize;
-            cubit.startGame();
+            cubit.startGame(widget.numberOfPlayer);
             return BlocConsumer<Gamecubit, GameStates>(
               listener: (BuildContext context, GameStates state) async {
                 if (state is CannotPlayHere) {
@@ -40,20 +41,17 @@ class _GameState extends State<Game> {
                 }
                 if (state is DrawGame) {
                   cubit.closeAd();
-                  MessageDialog messageDialog = customDialog(
+                  alertDialog(
                       title: 'Alert',
                       context: context,
                       meesage: "No One Win The Game");
-
-                  messageDialog.show(context);
                 }
                 if (state is WinGame) {
                   cubit.closeAd();
-                  MessageDialog messageDialog = customDialog(
+                  alertDialog(
                       title: 'Alert',
                       context: context,
                       meesage: "player:  ${cubit.player} Win The Game");
-                  messageDialog.show(context, barrierDismissible: false);
                 }
               },
               builder: (BuildContext context, GameStates state) {

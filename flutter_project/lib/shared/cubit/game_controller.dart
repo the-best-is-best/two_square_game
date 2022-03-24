@@ -14,6 +14,8 @@ class Gamecubit extends Cubit<GameStates> {
   List<String> board = [];
   int player = 1;
 
+  int numberOfPlayer = 2;
+
   int? _number1, _number2;
 
   int? number1() => _number1;
@@ -31,11 +33,11 @@ class Gamecubit extends Cubit<GameStates> {
     boardSize = addBoardSize;
   }
 
-  void startGame() async {
+  void startGame(int numOfPlayer) async {
     adLoaded = true;
     loading = true;
     totalGameNum = pow(boardSize, 2).toInt();
-
+    numberOfPlayer = numOfPlayer;
     for (int i = 0; i < totalGameNum; i++) {
       board.add("${i + 1}");
     }
@@ -120,10 +122,10 @@ class Gamecubit extends Cubit<GameStates> {
 
         if (turns != 0) {
           emit(GamePlayed());
-          if (player == 1) {
-            player = 2;
-          } else {
+          if (player == numberOfPlayer) {
             player = 1;
+          } else {
+            player++;
           }
         } else {
           emit(WinGame());
