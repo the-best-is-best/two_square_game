@@ -73,6 +73,13 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
       Map<String, String>? serverData;
       if (message.contains("Please Update Game First")) {
         emit(UpdateGameAlert());
+        Navigator.pushAndRemoveUntil(
+          context!,
+          MaterialPageRoute(
+            builder: (BuildContext context) => const Menu(),
+          ),
+          (route) => false,
+        );
         return;
       }
       serverData = super.joinRoom(data['data']);

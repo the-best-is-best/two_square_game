@@ -68,7 +68,7 @@ if (isset($jsonData->boardSize) && !isset($jsonData->playerId)) {
         exit;
     } else {
 
-        if ($jsonData->gameVersion < 8) {
+        if ($jsonData->gameVersion < 9) {
             $response = new Response();
             $response->setHttpStatusCode(400);
             $response->setSuccess(false);
