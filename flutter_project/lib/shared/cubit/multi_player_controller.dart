@@ -91,21 +91,6 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
         _idRoom = int.parse(serverData['id']!);
         _turn = 1;
 
-        try {
-          log("joining room_$_idRoom");
-        } catch (_) {
-          log("Player " + _player.toString() + " failed to subscribe");
-          Map<String, String> data = {
-            "roomId": "$_idRoom",
-            "userId": _player.toString()
-          };
-
-          await DioHelper.postData(
-              url: "delete/user_logout_before_room_start.php", query: data);
-          emit(FirebaseError());
-          return;
-        }
-
         if (message != "Join Room") {
           log("player" + _player.toString());
           return;
@@ -174,10 +159,6 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
         emit(StopTime());
       } else if (message == "Player Win") {
         emit(StopTime());
-
-        endGame(_player);
-        emit(EndGame());
-        log("Player Win");
       } else {
         roomError = true;
         emit(RoomError());
@@ -196,7 +177,6 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
   }
 
   void startTime(CountdownController time) async {
-    log("player : " + _player.toString());
     if (!_gameStarted) {
       countdownTimerTurn = 30;
       _gameStarted = true;
@@ -225,37 +205,16 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
     board[num2 - 1] = "x";
   }
 
-  void getBoard(int playerTurn) async {
-    countdownTimerTurn = 15;
-    emit(StartTime());
-    try {
-      if (playerTurn == _player) {
-        BotToast.showLoading();
-        Map<String, String> data = {
-          "roomId": "$_idRoom",
-          "message": "Get Data"
-        };
+  void getBoard(List<dynamic> getBoard) async {
+    board = getBoard;
 
-        var response = await DioHelper.postData(
-            url: "controller/control_room.php", query: data);
-
-        board = jsonDecode(response.data['data']['board']);
-
-        BotToast.closeAllLoading();
-
-        emit(GameReady());
-      } else {
-        emit(GameReady());
-        log("Not my Turn");
-      }
-    } catch (ex) {
-      getBoard(playerTurn);
-    }
     if (_turn == numberOfPlayer) {
       _turn = 1;
     } else {
       _turn++;
     }
+    emit(GameReady());
+    emit(StartTime());
   }
 
   void timeOut() {
@@ -319,19 +278,15 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
   void endGame(int? player) async {
     playerWin = player;
     emit(EndGame());
-    // FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
   }
 
   void lostPlayer(int player) async {
     playerLost = player;
     emit(EndGame());
-    // await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
   }
 
   void roomIssue() async {
     playerWin = null;
     emit(EndGame());
-
-    // await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
   }
 }

@@ -69,30 +69,20 @@ Future<void> main() async {
 
           if (mapMessage['message'] == "joined") {
             cubit.playerJoined();
-          } else if (mapMessage['message'].toString().contains("player win")) {
-            int playerWin = int.parse(mapMessage['message']
-                [mapMessage['message'].toString().length - 1]);
+          } else if (mapMessage['message'] == "player win") {
+            int playerWin = int.parse(mapMessage['player']);
             cubit.endGame(playerWin);
-          } else if (mapMessage['message'].toString().contains("player lost")) {
-            int playerLost = int.parse(mapMessage['message']
-                [mapMessage['message'].toString().length - 1]);
+          } else if (mapMessage['message'] == "player lost") {
+            int playerLost = int.parse(mapMessage['player']);
             cubit.lostPlayer(playerLost);
           } else if (mapMessage['message'] == "No One Win The Game") {
             cubit.endGame(0);
-          } else if (mapMessage['message']
-              .toString()
-              .contains("Get Data Player")) {
-            log("get Board");
-            int player = int.parse(mapMessage['message']
-                [mapMessage['message'].toString().length - 1]);
-            cubit.getBoard(player);
-          } else if (mapMessage['message'].toString().contains("Player Win")) {
-            List messageData = mapMessage['message'].toString().split('-');
-            int playerId = int.parse(messageData[1]);
+          } else if (mapMessage['message'] == "Get Data Player") {
+            List<dynamic> board = jsonDecode(mapMessage['board']);
+            cubit.getBoard(board);
+          } else if (mapMessage['message'] == "Player Win") {
+            int playerId = int.parse(mapMessage['player']);
             cubit.endGame(playerId);
-          } else if (mapMessage['message'].toString() == "Start Time") {
-            cubit.countdownTimerTurn = 30;
-            cubit.firebaseStartTime();
           } else if (mapMessage['message'] == "Room issue") {
             cubit.roomIssue();
           } else {

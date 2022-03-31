@@ -61,7 +61,11 @@ class _GameState extends State<Game> {
                   alertDialog(
                       title: 'Alert',
                       context: context,
-                      meesage: "player:  ${cubit.player} Win The Game");
+                      meesage: cubit.playWithFriends
+                          ? "player:  ${cubit.player} Win The Game"
+                          : cubit.player == 1
+                              ? "You Win The Game"
+                              : "You Lost - Win Bot : ${cubit.player - 1} ");
                 }
               },
               builder: (BuildContext context, GameStates state) {
@@ -86,7 +90,11 @@ class _GameState extends State<Game> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Current Player ${cubit.player}",
+                                  cubit.playWithFriends
+                                      ? "Current Player ${cubit.player}"
+                                      : cubit.player == 1
+                                          ? "Your Turn "
+                                          : "Current Bot ${cubit.player - 1}",
                                   style: TBIBFontStyle.b1,
                                 ),
                                 Padding(

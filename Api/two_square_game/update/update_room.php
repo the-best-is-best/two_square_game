@@ -1,5 +1,8 @@
 <?php
 require_once '../delete/room_delete_end.php';
+require_once '../models/fcm_model.php';
+
+
 function JoinRoom($writeDB, $id, $numOfPlayer, $user1, $user2, $user3, $user4)
 {
 
@@ -10,27 +13,27 @@ function JoinRoom($writeDB, $id, $numOfPlayer, $user1, $user2, $user3, $user4)
     $id_user3 = $user3;
     $id_user4 = $user4;
 
-    $my_userId=null;
+    $my_userId = null;
     $started = 0;
     if ($user1 == null || $user1 == 0) {
-        $my_userId= $id_user1 = 1;
+        $my_userId = $id_user1 = 1;
     } else {
-        if ($user2 == null || $user2==0) {
+        if ($user2 == null || $user2 == 0) {
             if ($numOfPlayer == 2)
                 $started = 1;
 
-                $my_userId=   $id_user2 = 2;
+            $my_userId =  $id_user2 = 2;
         } else {
-            if ($user3 == null  || $user3==0) {
+            if ($user3 == null  || $user3 == 0) {
                 if ($numOfPlayer == 3)
                     $started = 1;
 
-                    $my_userId=    $id_user3 = 3;
+                $my_userId = $id_user3 = 3;
             } else {
-                if ($numOfPlayer == 4 )
+                if ($numOfPlayer == 4)
                     $started = 1;
 
-                    $my_userId= $id_user4 = 4;
+                $my_userId = $id_user4 = 4;
             }
         }
     }
@@ -46,9 +49,9 @@ function JoinRoom($writeDB, $id, $numOfPlayer, $user1, $user2, $user3, $user4)
     $query->execute();
 
     if ($started == 1)
-        return array("startGame" ,$my_userId );
-    else{
-        return array("",$my_userId);
+        return array("startGame", $my_userId);
+    else {
+        return array("", $my_userId);
     }
 }
 function playController($id, $playerId, $action1, $action2)
@@ -153,6 +156,10 @@ function playController($id, $playerId, $action1, $action2)
                 $response->setSuccess(true);
                 $response->addMessage('No One Win The Game');
                 $response->send();
+
+
+                $dataFCM = ['message' => 'No One Win The Game'];
+                sendFCM($dataFCM, 'room_' . $id);
                 exit;
             }
             if ($turns != 0) {
@@ -175,14 +182,20 @@ function playController($id, $playerId, $action1, $action2)
                 $response->setSuccess(true);
                 $response->addMessage('Next Player');
                 $response->send();
+
+                $dataFCM = ['message' => "Get Data Player", "board" => $board];
+                sendFCM($dataFCM, 'room_' . $id);
                 exit;
             } else {
-
+                $turn = $row['turn'];
                 deleteRoomEnd($id);
                 $response = new Response();
                 $response->setHttpStatusCode(201);
                 $response->setSuccess(true);
                 $response->addMessage('Player Win');
+
+                $dataFCM = ['message' => "Player Win", "player" => $turn];
+                sendFCM($dataFCM, 'room_' . $id);
                 $response->send();
                 exit;
             }

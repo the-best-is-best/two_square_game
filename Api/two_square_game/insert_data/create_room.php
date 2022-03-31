@@ -1,6 +1,7 @@
 <?php
 
-function  makeRooms($boardSize, $numOfPlayer)
+
+function  makeRooms($boardSize, $numOfPlayer, $tokenPlayer)
 {
 
     try {
@@ -61,5 +62,7 @@ function  makeRooms($boardSize, $numOfPlayer)
     $response->setData($row);
     $response->addMessage('Room Created');
     $response->send();
+
+    subscribeFCM('room_' . $row['id'], $tokenPlayer);
     exit;
 }

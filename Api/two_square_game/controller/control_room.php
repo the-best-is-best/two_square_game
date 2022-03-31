@@ -3,6 +3,7 @@ require_once('../controller/db.php');
 require_once('../models/response.php');
 require_once('../models/room_model.php');
 require_once('../update/update_room.php');
+
 try {
     $writeDB = DB::connectionWriteDB();
 } catch (PDOException $ex) {
@@ -25,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD']  !== 'POST') {
     $response->send();
     exit;
 }
+
 
 
 $rowPostData = file_get_contents('php://input');
@@ -68,23 +70,45 @@ if (isset($jsonData->boardSize) && !isset($jsonData->playerId)) {
         exit;
     } else {
 
-        if ($jsonData->gameVersion < 9) {
+        if ($jsonData->gameVersion < 10) {
             $response = new Response();
             $response->setHttpStatusCode(400);
             $response->setSuccess(false);
 
-            $response->addMessage("Please Update Game First - your version is $jsonData->gameVersion");
+            $response->addMessage("Please Update Game First");
 
             $response->send();
             exit;
         }
     }
+    if(!isset($jsonData->tokenPlayer)){
+        $response = new Response();
+        $response->setHttpStatusCode(400);
+        $response->setSuccess(false);
+    
+        $response->addMessage("You can't access link");
+    
+        $response->send();
+        exit;
+    }
+  
     $boardSize = trim($jsonData->boardSize);
     $numOfPlayer=2;
     if(isset($jsonData->numOfPlayer)){
     $numOfPlayer = trim($jsonData->numOfPlayer);
     }
-    $room->joinOrCreate($boardSize, $numOfPlayer);
+    
+    $room->joinOrCreate($boardSize, $numOfPlayer , $jsonData->tokenPlayer);
+   
+} else if (isset($jsonData->playerId) && !isset($jsonData->boardSize)) {
+    if (!isset($jsonData->roomId) || !isset($jsonData->number1) || !isset($jsonData->number2)) {
+        
+    } else {
+        playController($jsonData->roomId, $jsonData->playerId, $jsonData->number1, $jsonData->number2);
+        return;
+    }
+} else {
+ 
     $response = new Response();
     $response->setHttpStatusCode(400);
     $response->setSuccess(false);
@@ -93,26 +117,4 @@ if (isset($jsonData->boardSize) && !isset($jsonData->playerId)) {
 
     $response->send();
     exit;
-} else if (isset($jsonData->playerId) && !isset($jsonData->boardSize)) {
-    if (!isset($jsonData->roomId) || !isset($jsonData->number1) || !isset($jsonData->number2)) {
-    } else {
-        playController($jsonData->roomId, $jsonData->playerId, $jsonData->number1, $jsonData->number2);
-        return;
-    }
-} else {
-    if (isset($jsonData->message)) {
-        if ($jsonData->message = "Get Data") {
-            $room->getData($jsonData->roomId);
-            return;
-        }
-    } else {
-        $response = new Response();
-        $response->setHttpStatusCode(400);
-        $response->setSuccess(false);
-
-        $response->addMessage("You can't access link");
-
-        $response->send();
-        exit;
-    }
 }

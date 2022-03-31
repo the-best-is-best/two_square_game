@@ -74,7 +74,6 @@ TBIBDialog alertDialog({
 TBIBDialog askQuestions({
   required BuildContext context,
   required Menucubit cubitMenu,
-  bool isMulti = false,
 }) {
   return TBIBDialog(
     context: context,
@@ -118,7 +117,6 @@ TBIBDialog askQuestions({
                       askManyPlayer(
                         context: context,
                         cubit: cubitMenu,
-                        isMulti: isMulti,
                       );
                     } else {
                       push(
@@ -142,7 +140,6 @@ TBIBDialog askQuestions({
                       askManyPlayer(
                         context: context,
                         cubit: cubitMenu,
-                        isMulti: isMulti,
                       );
                     } else {
                       push(

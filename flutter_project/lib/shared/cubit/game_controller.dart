@@ -154,29 +154,8 @@ class Gamecubit extends Cubit<GameStates> {
   }
 
   void aiPlay({bool first = true}) async {
-    print(availableGame);
     Random ran = Random();
-    // print(testList);
-    // Random random = Random();
-    // int indexOfAvalibleGame = random.nextInt(availableGame.length);
-    // _action(availableGame[indexOfAvalibleGame][0],
-    //     availableGame[indexOfAvalibleGame][1]);
 
-    // availableGame.clear();
-
-    /*
-    easy mode 
-    Random ran = Random();
-    int index = ran.nextInt(totalGameNum);
-    int index2 = ran.nextInt(4);
-    print(
-        "first action : $index || Second Action : ${testList[index][index2]}");
-    if (testList[index][index2] != 0) {
-      _action(index + 1, testList[index][index2]);
-    } else {
-      aiPlay();
-      return;
-    }*/
     int wait = 0;
     if (first) {
       wait = ran.nextInt(1000) + 1000;
@@ -201,22 +180,18 @@ class Gamecubit extends Cubit<GameStates> {
                 availableGame[numY - 1][z] != x + 1) {
               num2 = availableGame[numY - 1][z];
               avalibleGameAccess.add(num2);
-              //    break getZ;
             }
           }
           if (avalibleGameAccess.length == 1) {
-            print(
-                "played the only one way ,$numY AND $num2,  Bot Number $player");
             _action(numY, num2);
             played = true;
             break;
           } else if (avalibleGameAccess.isNotEmpty) {
-            print("Avalible moves : ${avalibleGameAccess.length}");
             int random = ran
                 .nextInt(avalibleGameAccess.length * avalibleGameAccess.length);
             num2 = avalibleGameAccess[
                 (random / avalibleGameAccess.length).floor()];
-            print("played in $numY, and $num2  Bot Number $player");
+
             _action(numY, num2);
             played = true;
             break;
@@ -226,8 +201,7 @@ class Gamecubit extends Cubit<GameStates> {
       if (!played) {
         int index = ran.nextInt(totalGameNum);
         int index2 = ran.nextInt(4);
-        print(
-            "first action : $index || Second Action : ${availableGame[index][index2]} Bot Number $player");
+
         if (availableGame[index][index2] != 0) {
           _action(index + 1, availableGame[index][index2]);
         } else {

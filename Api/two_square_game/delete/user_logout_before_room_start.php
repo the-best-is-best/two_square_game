@@ -62,7 +62,6 @@ if (!isset($jsonData->roomId) || !isset($jsonData->userId)) {
         } else if ($jsonData->userId == 4) {
             $row['id_user4'] = null;
         }
-print_r($row);
         $query = $conDB->prepare('UPDATE rooms_two_square_game SET id_user1 = :id_user1 , id_user2 = :id_user2 , id_user3 = :id_user3 , id_user4 = :id_user4 WHERE id = :id');
 
         $query->bindParam(':id', $jsonData->roomId, PDO::PARAM_STR);

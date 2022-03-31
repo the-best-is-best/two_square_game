@@ -1,6 +1,7 @@
 <?php
 require_once('../controller/db.php');
 require_once('../models/response.php');
+require_once '../models/fcm_model.php';
 try {
     $writeDB = DB::connectionWriteDB();
 } catch (PDOException $ex) {
@@ -36,23 +37,42 @@ if (!$jsonData = json_decode($rowPostData)) {
     exit;
 }
 
-if(!isset($jsonData->roomId)){
+if (!isset($jsonData->roomId) || !isset($jsonData->playerToken) || !isset($jsonData->playerId) || !isset($jsonData->roomError)) {
 
 
+
+    $response = new Response();
+    $response->setHttpStatusCode(400);
+    $response->setSuccess(false);
+
+    (!isset($jsonData->roomId) ?  $response->addMessage("Room id not supplied") : false);
+    (!isset($jsonData->playerToken) ?  $response->addMessage("playerToken not supplied") : false);
+    (!isset($jsonData->playerId) ?  $response->addMessage("playerId not supplied") : false);
+    (!isset($jsonData->roomError) ?  $response->addMessage("roomError not supplied") : false);
+
+    $response->send();
+
+
+    exit;
+} else {
    
-        $response = new Response();
-        $response->setHttpStatusCode(400);
-        $response->setSuccess(false);
-    
-        (!isset($jsonData->roomId) ?  $response->addMessage("Room id not supplied") : false);
-       
-        $response->send();
-        exit;
-    
-    
-}else{
-$query = $writeDB->prepare('DELETE FROM rooms_two_square_game  WHERE id = :id');
+    $resultFCM;
+    if ($jsonData->roomError == 0) {
+        $dataMessage = ["message" => "player lost"  ,"player"=> $jsonData->playerId];
+        $resultFCM =  sendFCM($dataMessage, "room_$jsonData->roomId");
+    } else if ($jsonData->roomError == 1) {
+        $dataMessage = ["message" => "Room issue"];
+        $resultFCM =  sendFCM($dataMessage, "room_$jsonData->roomId");
+    }
+unSubscribeFCM( "room_$jsonData->roomId" , $jsonData->playerToken);
 
-$query->bindParam(':id', $jsonData->roomId, PDO::PARAM_STR);
-$query->execute();
+
+  
+
+   $query = $writeDB->prepare('DELETE FROM rooms_two_square_game  WHERE id = :id');
+
+    $query->bindParam(':id', $jsonData->roomId, PDO::PARAM_STR);
+    $query->execute();
+
+
 }
