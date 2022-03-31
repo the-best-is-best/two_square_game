@@ -7,9 +7,10 @@ import 'states/menu_states.dart';
 class Menucubit extends Cubit<MenuStates> {
   Menucubit() : super(MenuInitialStates());
   static Menucubit get(context) => BlocProvider.of(context);
-
+  bool playWithFriends = false;
   int boardSize = 4;
   String displayMode = "Easy";
+  int numberOfPlayer = 2;
   bool multiClicked = false;
 
   void changeMode(String mode) {

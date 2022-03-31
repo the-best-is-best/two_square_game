@@ -110,14 +110,6 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                     context: context,
                     meesage: info,
                     multiplayer: true);
-              } else if (state is LogoutGame) {
-                BotToast.closeAllLoading();
-
-                alertDialog(
-                    title: 'Alert',
-                    context: context,
-                    meesage: "You Lost The Game",
-                    multiplayer: true);
               } else if (state is StartTime) {
                 cubit.startTime(cubitCountdownTimer);
               } else if (state is StopTime) {

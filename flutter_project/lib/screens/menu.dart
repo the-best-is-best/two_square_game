@@ -138,27 +138,18 @@ class _MenuState extends State<Menu> {
                               onPressed: cubit.multiClicked
                                   ? null
                                   : () async {
-                                      if (cubit.displayMode == "Easy") {
-                                        MyInterstitial.getAd();
-                                        MyBannerAd.checkAdLoaded();
-                                        push(
+                                      MyInterstitial.getAd();
+                                      MyBannerAd.checkAdLoaded();
+                                      askQuestions(
                                           context: context,
-                                          widget: Game(cubit.boardSize, 2),
-                                        );
-                                      } else {
-                                        log(cubit.boardSize.toString());
-                                        askManyPlayer(
-                                            cubit: cubit,
-                                            cubitGame: Gamecubit(),
-                                            context: context,
-                                            gameMode: cubit.displayMode);
-                                      }
+                                          cubitMenu: cubit,
+                                          isMulti: false);
                                     },
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   "Play",
-                                  style: TBIBFontStyle.h3,
+                                  style: TBIBFontStyle.h4,
                                 ),
                               ),
                             ),
@@ -217,13 +208,15 @@ class _MenuState extends State<Menu> {
                                                 MultiPlayer(cubit.boardSize, 2),
                                           );
                                         } else {
-                                          askManyPlayer(
-                                              context: context,
-                                              cubit: cubit,
-                                              isMulti: true,
-                                              cubitMulti: MultiPlayercubit(),
-                                              gameMode: cubit.displayMode);
+                                          // askManyPlayer(
+                                          //     context: context,
+                                          //     cubit: cubit,
+                                          //     gameMode: cubit.displayMode);
                                         }
+                                        push(
+                                            widget: MultiPlayer(cubit.boardSize,
+                                                cubit.numberOfPlayer),
+                                            context: context);
                                         cubit.multiPlayerClick(false);
                                       },
                                 child: Text(

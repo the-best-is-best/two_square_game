@@ -1,6 +1,6 @@
+import 'dart:io';
 import 'dart:math';
 
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'states/game_states.dart';
@@ -10,6 +10,8 @@ class Gamecubit extends Cubit<GameStates> {
 
   Gamecubit() : super(GameInitialState());
   static Gamecubit get(context) => BlocProvider.of(context);
+
+  bool playWithFriends = false;
 
   List<String> board = [];
   int player = 1;
@@ -24,6 +26,10 @@ class Gamecubit extends Cubit<GameStates> {
   bool loading = false;
   int totalGameNum = 0;
 
+  late List<List<int>> availableGame;
+  //List<int> HardList;
+  bool turnBot = false;
+
   void closeAd() {
     adLoaded = false;
     emit(ClosedAd());
@@ -33,9 +39,14 @@ class Gamecubit extends Cubit<GameStates> {
     boardSize = addBoardSize;
   }
 
-  void startGame(int numOfPlayer) async {
+  void startGame(
+      {required int numOfPlayer,
+      required bool withFriend,
+      required int sendBoard}) async {
+    playWithFriends = withFriend;
     adLoaded = true;
     loading = true;
+    boardSize = sendBoard;
     totalGameNum = pow(boardSize, 2).toInt();
     numberOfPlayer = numOfPlayer;
     for (int i = 0; i < totalGameNum; i++) {
@@ -62,7 +73,6 @@ class Gamecubit extends Cubit<GameStates> {
   }
 
   void _action(action1, action2) {
-    BotToast.showLoading();
     if (board[action1 - 1] != "x" && board[action2 - 1] != "x") {
       if ((action2 - action1).abs() == boardSize ||
           (action2 - action1).abs() == 1) {
@@ -70,62 +80,67 @@ class Gamecubit extends Cubit<GameStates> {
           if (action1 % boardSize == 0 && action2 == action1 + 1 ||
               action2 % boardSize == 0 && action1 == action2 + 1) {
             emit(CannotPlayHere());
-            BotToast.closeAllLoading();
+
             return;
           }
         }
 
         board[action1 - 1] = "x";
         board[action2 - 1] = "x";
-
-        int turns = 0;
+        availableGame =
+            List.generate(totalGameNum, (i) => List.generate(4, (i) => 0));
+        bool turns = false;
         bool draw = true;
 
         for (int i = 0; i < board.length; i++) {
           if (board[i] != "x") {
             draw = false;
+            //   int numberOfPlayes = 0;
 
             if ((i + 1) % boardSize != 0) {
               if ((i + 1) < totalGameNum && board[i + 1] != "x") {
-                turns += 1;
-
-                break;
+                turns = true;
+                availableGame[i][0] = i + 2;
+                //    availableGame.add([i + 1, i + 2]);
               }
             }
 
             if ((i) % (boardSize) != 0) {
               if ((i - 1) >= 0 && board[i - 1] != "x") {
-                turns += 1;
-
-                break;
+                turns = true;
+                availableGame[i][1] = i;
+                //    availableGame.add([i + 1, i]);
               }
             }
 
             if ((i - boardSize) >= 0 && board[i - boardSize] != "x") {
-              turns += 1;
-
-              break;
+              turns = true;
+              availableGame[i][2] = i + 1 - boardSize;
+              //  availableGame.add([i + 1, i + 1 - boardSize]);
             }
 
             if ((i + boardSize) < totalGameNum && board[i + boardSize] != "x") {
-              turns += 1;
-
-              break;
+              turns = true;
+              availableGame[i][3] = i + 1 + boardSize;
+              //availableGame.add([i + 1, i + 1 + boardSize]);
             }
           }
         }
         if (draw == true) {
           emit(DrawGame());
-          BotToast.closeAllLoading();
+
           return;
         }
 
-        if (turns != 0) {
+        if (turns) {
           emit(GamePlayed());
           if (player == numberOfPlayer) {
             player = 1;
           } else {
             player++;
+            if (!playWithFriends) {
+              aiPlay();
+            }
           }
         } else {
           emit(WinGame());
@@ -136,6 +151,90 @@ class Gamecubit extends Cubit<GameStates> {
     } else {
       emit(CannotPlayHere());
     }
-    BotToast.closeAllLoading();
+  }
+
+  void aiPlay({bool first = true}) async {
+    print(availableGame);
+    Random ran = Random();
+    // print(testList);
+    // Random random = Random();
+    // int indexOfAvalibleGame = random.nextInt(availableGame.length);
+    // _action(availableGame[indexOfAvalibleGame][0],
+    //     availableGame[indexOfAvalibleGame][1]);
+
+    // availableGame.clear();
+
+    /*
+    easy mode 
+    Random ran = Random();
+    int index = ran.nextInt(totalGameNum);
+    int index2 = ran.nextInt(4);
+    print(
+        "first action : $index || Second Action : ${testList[index][index2]}");
+    if (testList[index][index2] != 0) {
+      _action(index + 1, testList[index][index2]);
+    } else {
+      aiPlay();
+      return;
+    }*/
+    int wait = 0;
+    if (first) {
+      wait = ran.nextInt(1000) + 1000;
+    }
+    Future.delayed(Duration(milliseconds: wait)).then((_) {
+      bool played = false;
+      for (int x = 0; x < totalGameNum; x++) {
+        int turns = 0;
+        int numY = 0;
+        for (int y = 0; y < 4; y++) {
+          if (availableGame[x][y] != 0) {
+            turns++;
+            numY = availableGame[x][y];
+          }
+        }
+        List<int> avalibleGameAccess = [];
+        if (turns == 1) {
+          int num2 = 0;
+
+          for (int z = 0; z < 4; z++) {
+            if (availableGame[numY - 1][z] != 0 &&
+                availableGame[numY - 1][z] != x + 1) {
+              num2 = availableGame[numY - 1][z];
+              avalibleGameAccess.add(num2);
+              //    break getZ;
+            }
+          }
+          if (avalibleGameAccess.length == 1) {
+            print(
+                "played the only one way ,$numY AND $num2,  Bot Number $player");
+            _action(numY, num2);
+            played = true;
+            break;
+          } else if (avalibleGameAccess.isNotEmpty) {
+            print("Avalible moves : ${avalibleGameAccess.length}");
+            int random = ran
+                .nextInt(avalibleGameAccess.length * avalibleGameAccess.length);
+            num2 = avalibleGameAccess[
+                (random / avalibleGameAccess.length).floor()];
+            print("played in $numY, and $num2  Bot Number $player");
+            _action(numY, num2);
+            played = true;
+            break;
+          }
+        }
+      }
+      if (!played) {
+        int index = ran.nextInt(totalGameNum);
+        int index2 = ran.nextInt(4);
+        print(
+            "first action : $index || Second Action : ${availableGame[index][index2]} Bot Number $player");
+        if (availableGame[index][index2] != 0) {
+          _action(index + 1, availableGame[index][index2]);
+        } else {
+          aiPlay(first: false);
+          return;
+        }
+      }
+    });
   }
 }

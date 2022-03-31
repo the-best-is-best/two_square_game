@@ -55,6 +55,7 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
         "gameVersion": packageInfo.buildNumber,
         "boardSize": boardSize,
         "numOfPlayer": numOfPlayer,
+        "tokenPlayer": await FirebaseMessaging.instance.getToken(),
       });
     } catch (ex) {
       BotToast.showText(text: "Server Error");
@@ -65,7 +66,7 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
         ),
         (route) => false,
       );
-      log(packageInfo.buildNumber.toString());
+      log("error: $ex - " + packageInfo.buildNumber.toString());
     }
     if (response != null) {
       var data = response.data;
@@ -92,7 +93,6 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
 
         try {
           log("joining room_$_idRoom");
-          await FirebaseMessaging.instance.subscribeToTopic("room_$_idRoom");
         } catch (_) {
           log("Player " + _player.toString() + " failed to subscribe");
           Map<String, String> data = {
@@ -110,9 +110,6 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
           log("player" + _player.toString());
           return;
         }
-        Map sendData = {"message": "joined"};
-
-        await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
       } else {
         emit(ServerError());
       }
@@ -161,11 +158,9 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
         BotToast.closeAllLoading();
         return;
       } else if (message == "No One Win The Game") {
-        _getBoardLocal(num1, num2);
-        Map sendData = {"message": "No One Win The Game"};
         emit(StopTime());
+        _getBoardLocal(num1, num2);
 
-        await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
         emit(DrawGame());
       } else if (message == "Next Player") {
         _getBoardLocal(num1, num2);
@@ -177,15 +172,8 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
         }
 
         emit(StopTime());
-
-        Map sendData = {"message": "Get Data Player-$nextTurn"};
-
-        await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
       } else if (message == "Player Win") {
-        Map sendData = {"message": "Player Win-$_player"};
         emit(StopTime());
-
-        await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
 
         endGame(_player);
         emit(EndGame());
@@ -252,8 +240,7 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
             url: "controller/control_room.php", query: data);
 
         board = jsonDecode(response.data['data']['board']);
-        Map sendData = {"message": "Start Time"};
-        await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
+
         BotToast.closeAllLoading();
 
         emit(GameReady());
@@ -275,7 +262,7 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
     if (_turn == _player) logout();
   }
 
-  void logout({bool pleaseUpdate = false}) async {
+  void logout() async {
     await Wakelock.disable();
     _closeAd();
 
@@ -300,23 +287,19 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
         } catch (_) {}
       } else {
         if (_gameStarted && !roomError) {
-          await DioHelper.postData(
-              url: "delete/room_delete.php", query: {"roomId": _idRoom});
-          Map sendData = {"message": "player lost $_player"};
-          DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
-          try {
-            emit(LogoutGame());
-          } catch (_) {}
+          DioHelper.postData(url: "delete/room_delete.php", query: {
+            "roomId": _idRoom,
+            "playerToken": await FirebaseMessaging.instance.getToken(),
+            "playerId": _player,
+            "roomError": 0
+          });
         } else if (_gameStarted && roomError) {
-          await DioHelper.postData(
-              url: "delete/room_delete.php", query: {"roomId": _idRoom});
-          Map sendData = {};
-          sendData = {"message": "Room issue"};
-
-          await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
+          await DioHelper.postData(url: "delete/room_delete.php", query: {
+            "roomId": _idRoom,
+            "playerToken": await FirebaseMessaging.instance.getToken(),
+            "roomError": 1
+          });
         }
-
-        await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
       }
     } else {
       Navigator.pushAndRemoveUntil(
@@ -336,19 +319,19 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
   void endGame(int? player) async {
     playerWin = player;
     emit(EndGame());
-    await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
+    // FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
   }
 
   void lostPlayer(int player) async {
     playerLost = player;
     emit(EndGame());
-    await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
+    // await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
   }
 
   void roomIssue() async {
     playerWin = null;
     emit(EndGame());
 
-    await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
+    // await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
   }
 }

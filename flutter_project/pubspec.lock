@@ -458,7 +458,7 @@ packages:
   tbib_dialog:
     dependency: "direct main"
     description:
-      path: "../../../tbib_library/tbib_dialog"
+      path: "../../../../tbib_library/tbib_dialog"
       relative: true
     source: path
     version: "0.0.1"
@@ -472,7 +472,7 @@ packages:
   tbib_style:
     dependency: "direct main"
     description:
-      path: "../../../tbib_library/tbib_style"
+      path: "../../../../tbib_library/tbib_style"
       relative: true
     source: path
     version: "1.0.4"

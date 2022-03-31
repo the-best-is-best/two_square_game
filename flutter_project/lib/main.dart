@@ -53,7 +53,6 @@ Future<void> main() async {
         CheckInternet.isConnected) {
       FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
     }
-
     BlocOverrides.runZoned(
       () {
         runApp(const MyApp());
@@ -62,10 +61,8 @@ Future<void> main() async {
     );
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      Map? mapMessage;
-      mapMessage = json.decode(message.data['listen']);
-      log("firebase message listen");
-      if (mapMessage != null && mapMessage['message'] != null) {
+      Map mapMessage = message.data;
+      if (mapMessage['message'] != null) {
         if (MultiPlayercubit.context != null) {
           MultiPlayercubit cubit =
               MultiPlayercubit.get(MultiPlayercubit.context!);

@@ -13,8 +13,14 @@ import '../shared/cubit/states/game_states.dart';
 class Game extends StatefulWidget {
   final int boardSize;
   final int numberOfPlayer;
+  final bool playWithFriends;
 
-  const Game(this.boardSize, this.numberOfPlayer, {Key? key}) : super(key: key);
+  const Game({
+    Key? key,
+    required this.boardSize,
+    required this.playWithFriends,
+    required this.numberOfPlayer,
+  }) : super(key: key);
 
   @override
   State<Game> createState() => _GameState();
@@ -32,7 +38,11 @@ class _GameState extends State<Game> {
           child: Builder(builder: (context) {
             Gamecubit cubit = Gamecubit.get(context);
             cubit.boardSize = widget.boardSize;
-            cubit.startGame(widget.numberOfPlayer);
+            cubit.startGame(
+              sendBoard: widget.boardSize,
+              withFriend: widget.playWithFriends,
+              numOfPlayer: widget.numberOfPlayer,
+            );
             return BlocConsumer<Gamecubit, GameStates>(
               listener: (BuildContext context, GameStates state) async {
                 if (state is CannotPlayHere) {
@@ -102,11 +112,20 @@ class _GameState extends State<Game> {
                                                 padding:
                                                     const EdgeInsets.all(0),
                                                 textStyle: TBIBFontStyle.b1),
-                                            onPressed: cubit.number1() == i + 1
-                                                ? null
-                                                : () {
-                                                    cubit.selectNum(i + 1);
-                                                  },
+                                            onPressed: cubit.playWithFriends
+                                                ? cubit.number1() == i + 1
+                                                    ? null
+                                                    : () {
+                                                        cubit.selectNum(i + 1);
+                                                      }
+                                                : cubit.player == 1
+                                                    ? cubit.number1() == i + 1
+                                                        ? null
+                                                        : () {
+                                                            cubit.selectNum(
+                                                                i + 1);
+                                                          }
+                                                    : null,
                                             child: Text(cubit.board[i]),
                                           ),
                                         ),
