@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:buildcondition/buildcondition.dart';
 import 'package:flutter/material.dart';
@@ -92,8 +94,9 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                     meesage: "No one WIN the game",
                     multiplayer: true);
               } else if (state is EndGame) {
+                log("ended");
                 BotToast.closeAllLoading();
-
+                log(cubit.playerLost.toString());
                 String info = cubit.playerLost == null
                     ? cubit.playerWin == 0
                         ? "No One Win The Game"
@@ -110,16 +113,10 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                     context: context,
                     meesage: info,
                     multiplayer: true);
-              } else if (state is LogoutGame) {
-                BotToast.closeAllLoading();
-
-                alertDialog(
-                    title: 'Alert',
-                    context: context,
-                    meesage: "You Lost The Game",
-                    multiplayer: true);
               } else if (state is StartTime) {
-                cubit.startTime(cubitCountdownTimer);
+                try {
+                  cubit.startTime(cubitCountdownTimer);
+                } catch (_) {}
               } else if (state is StopTime) {
                 cubit.stopTime(cubitCountdownTimer);
               } else if (state is RoomError) {

@@ -53,7 +53,6 @@ Future<void> main() async {
         CheckInternet.isConnected) {
       FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
     }
-
     BlocOverrides.runZoned(
       () {
         runApp(const MyApp());

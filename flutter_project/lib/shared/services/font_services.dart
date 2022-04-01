@@ -7,7 +7,6 @@ import '../util/device_screen.dart';
 
 void fontsServices() {
   if (DeviceType.isLargeScreen()) {
-    TBIBFontStyle.defaultFlutterStyle();
     TBIBFontStyle.h4 = TBIBFontStyle.h4.copyWith(fontWeight: FontWeight.w400);
     TBIBFontStyle.h3 = TBIBFontStyle.h3.copyWith(fontWeight: FontWeight.w600);
   }
@@ -24,6 +23,10 @@ void fontsServices() {
   );
 
   TBIBFontStyle.h5 = TBIBFontStyle.h5.copyWith(
+    color: const Color.fromRGBO(206, 222, 235, .5),
+  );
+
+  TBIBFontStyle.h6 = TBIBFontStyle.h5.copyWith(
     color: const Color.fromRGBO(206, 222, 235, .5),
   );
   log(TBIBFontStyle.h4.fontSize.toString());

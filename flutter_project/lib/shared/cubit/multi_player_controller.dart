@@ -186,10 +186,6 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
         emit(StopTime());
 
         await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
-
-        endGame(_player);
-        emit(EndGame());
-        log("Player Win");
       } else {
         roomError = true;
         emit(RoomError());
@@ -303,10 +299,8 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
           await DioHelper.postData(
               url: "delete/room_delete.php", query: {"roomId": _idRoom});
           Map sendData = {"message": "player lost $_player"};
+
           DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
-          try {
-            emit(LogoutGame());
-          } catch (_) {}
         } else if (_gameStarted && roomError) {
           await DioHelper.postData(
               url: "delete/room_delete.php", query: {"roomId": _idRoom});
@@ -315,17 +309,7 @@ class MultiPlayercubit extends Cubit<MultiPlyerStates> with JoinRoomcubit {
 
           await DioHelper.postNotification(to: "room_$_idRoom", data: sendData);
         }
-
-        await FirebaseMessaging.instance.unsubscribeFromTopic("room_$_idRoom");
       }
-    } else {
-      Navigator.pushAndRemoveUntil(
-        context!,
-        MaterialPageRoute(
-          builder: (BuildContext context) => const Menu(),
-        ),
-        (route) => false,
-      );
     }
   }
 
