@@ -55,7 +55,7 @@ class _HowToPlayState extends State<HowToPlay> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20.0),
                   child: Text(
-                    """You can't play Choose Two Squares alone, it's an online  multiplayer game or 2 player offline game.
+                    """You can play Choose Two Squares single or multiplayer game with 2 players or more.
         
          HOW TO PLAY :
                   first you have to choose two adjacent numbers like (in easy mode) 3 and 4, or 3 and 7, then it will be the other player turn.

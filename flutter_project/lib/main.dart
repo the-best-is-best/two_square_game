@@ -36,6 +36,7 @@ Future<void> main() async {
     WidgetsFlutterBinding.ensureInitialized();
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
     await CheckInternet.init();
     await GoogleServesesChecker.init();
     await FirebaseInit.firebaseServices(

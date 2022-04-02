@@ -165,6 +165,7 @@ class _MenuState extends State<Menu> {
                                     ? null
                                     : () async {
                                         cubit.multiPlayerClick(true);
+
                                         await CheckInternet.init();
                                         if (FirebaseInit.token == null &&
                                             CheckInternet.isConnected) {
@@ -177,12 +178,13 @@ class _MenuState extends State<Menu> {
                                                 GoogleServesesChecker
                                                     .getPlaSytoreAvailability,
                                                 CheckInternet.isConnected);
-
-                                            MyBannerAd.checkAdLoaded();
-                                            BotToast.showText(
-                                                text:
-                                                    "Connected with google services");
                                           }
+
+                                          MyBannerAd.checkAdLoaded();
+                                          BotToast.showText(
+                                              text:
+                                                  "Connected with google services");
+
                                           cubit.multiPlayerClick(false);
                                         } else if (FirebaseInit.token != null) {
                                           MyBannerAd.checkAdLoaded();
