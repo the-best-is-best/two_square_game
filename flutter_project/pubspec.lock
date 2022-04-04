@@ -240,6 +240,27 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  font_awesome_flutter:
+    dependency: "direct main"
+    description:
+      name: font_awesome_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "10.1.0"
+  games_services:
+    dependency: "direct main"
+    description:
+      name: games_services
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.7"
+  games_services_platform_interface:
+    dependency: transitive
+    description:
+      name: games_services_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.5"
   google_api_availability:
     dependency: "direct main"
     description:
@@ -475,7 +496,7 @@ packages:
       path: "../../../../tbib_library/tbib_style"
       relative: true
     source: path
-    version: "1.0.4"
+    version: "2.0.0"
   term_glyph:
     dependency: transitive
     description:

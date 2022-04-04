@@ -45,7 +45,7 @@ class _MenuState extends State<Menu> {
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: myAppBar('Choose 2 Squares - menu', context: context),
+      appBar: myAppBar('Choose 2 Squares - menu', context: context, menu: true),
       body: DoubleBackToCloseApp(
         snackBar: const SnackBar(
           content: Text('Tap back again to leave'),
@@ -174,10 +174,18 @@ class _MenuState extends State<Menu> {
                                                       .getPlaSytoreAvailability ==
                                                   GooglePlayServicesAvailability
                                                       .success) {
-                                            await FirebaseInit.firebaseServices(
-                                                GoogleServesesChecker
-                                                    .getPlaSytoreAvailability,
-                                                CheckInternet.isConnected);
+                                            String success = await FirebaseInit
+                                                .firebaseServices(
+                                                    GoogleServesesChecker
+                                                        .getPlaSytoreAvailability,
+                                                    CheckInternet.isConnected);
+
+                                            if (success == "error") {
+                                              cubit.multiPlayerClick(false);
+                                              BotToast.showText(
+                                                  text: "Server Error");
+                                              return;
+                                            }
                                           }
 
                                           MyBannerAd.checkAdLoaded();

@@ -107,6 +107,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'androidx.work:work-runtime-ktx:2.7.0'
+    implementation 'com.google.android.gms:play-services-location:19.0.1'
+
     
 
 }

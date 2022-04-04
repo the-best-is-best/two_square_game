@@ -1,18 +1,16 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:games_services/games_services.dart';
 import 'package:google_api_availability/google_api_availability.dart';
-import 'package:tbib_style/tbib_style.dart';
+import 'package:tbib_style/responsive_font.dart';
 import 'package:two_square_game/screens/splash_screen.dart';
 import 'package:two_square_game/shared/cubit/menu_controller.dart';
 import 'package:two_square_game/shared/network/dio_network.dart';
@@ -21,7 +19,6 @@ import 'package:two_square_game/shared/services/check_internet.dart';
 import 'package:two_square_game/shared/services/firebase_services.dart';
 
 import 'shared/bloc_observer.dart';
-import 'shared/cubit/multi_player_controller.dart';
 import 'shared/services/alert_google_services.dart';
 import 'shared/services/font_services.dart';
 import 'shared/util/device_screen.dart';
@@ -34,6 +31,8 @@ const _kTestingCrashlytics = true;
 Future<void> main() async {
   await runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    GamesServices.signIn();
+
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
@@ -60,57 +59,6 @@ Future<void> main() async {
       },
       blocObserver: MyBlocObserver(),
     );
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      Map? mapMessage;
-      mapMessage = json.decode(message.data['listen']);
-      log("firebase message listen");
-      if (mapMessage != null && mapMessage['message'] != null) {
-        if (MultiPlayercubit.context != null) {
-          MultiPlayercubit cubit =
-              MultiPlayercubit.get(MultiPlayercubit.context!);
-
-          if (mapMessage['message'] == "joined") {
-            cubit.playerJoined();
-          } else if (mapMessage['message'].toString().contains("player win")) {
-            int playerWin = int.parse(mapMessage['message']
-                [mapMessage['message'].toString().length - 1]);
-            cubit.endGame(playerWin);
-          } else if (mapMessage['message'].toString().contains("player lost")) {
-            int playerLost = int.parse(mapMessage['message']
-                [mapMessage['message'].toString().length - 1]);
-            cubit.lostPlayer(playerLost);
-          } else if (mapMessage['message'] == "No One Win The Game") {
-            cubit.endGame(0);
-          } else if (mapMessage['message']
-              .toString()
-              .contains("Get Data Player")) {
-            log("get Board");
-            int player = int.parse(mapMessage['message']
-                [mapMessage['message'].toString().length - 1]);
-            cubit.getBoard(player);
-          } else if (mapMessage['message'].toString().contains("Player Win")) {
-            List messageData = mapMessage['message'].toString().split('-');
-            int playerId = int.parse(messageData[1]);
-            cubit.endGame(playerId);
-          } else if (mapMessage['message'].toString() == "Start Time") {
-            cubit.countdownTimerTurn = 30;
-            cubit.firebaseStartTime();
-          } else if (mapMessage['message'] == "Room issue") {
-            cubit.roomIssue();
-          } else {
-            log("i got nothing, message : " + mapMessage['message'].toString());
-          }
-        } else {
-          log("Page null");
-          MultiPlayercubit cubit =
-              MultiPlayercubit.get(MultiPlayercubit.context!);
-          cubit.logout();
-        }
-      } else {
-        log("Message null ");
-      }
-    });
   }, (error, stackTrace) {
     if (GoogleServesesChecker.getPlaSytoreAvailability ==
             GooglePlayServicesAvailability.success &&
@@ -128,9 +76,24 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool isOpened = false;
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
+
   final botToastBuilder = BotToastInit();
+
   Future<void>? _initializeFlutterFireFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    if (GoogleServesesChecker.getPlaSytoreAvailability ==
+            GooglePlayServicesAvailability.success &&
+        CheckInternet.isConnected) {
+      _initializeFlutterFireFuture = _initializeFlutterFire();
+    }
+  }
+
   Future<void> firebaseError() async {}
 
   Future<void> _testAsyncErrorOnInit() async {
@@ -160,19 +123,6 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  static FirebaseAnalyticsObserver observer =
-      FirebaseAnalyticsObserver(analytics: analytics);
-  @override
-  void initState() {
-    super.initState();
-    if (GoogleServesesChecker.getPlaSytoreAvailability ==
-            GooglePlayServicesAvailability.success &&
-        CheckInternet.isConnected) {
-      _initializeFlutterFireFuture = _initializeFlutterFire();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -189,24 +139,11 @@ class _MyAppState extends State<MyApp> {
             debugShowCheckedModeBanner: false,
             title: 'Choose Two Squares',
             builder: (context, child) {
-              if (!isOpened) {
-                ScreenUtil.setContext(context);
+              ScreenUtil.setContext(context);
 
-                TBIBFontStyle.h3 = TBIBFontStyle.h3
-                    .copyWith(fontSize: TBIBFontStyle.h3.fontSize!.sp);
-                TBIBFontStyle.h4 = TBIBFontStyle.h4
-                    .copyWith(fontSize: TBIBFontStyle.h4.fontSize!.sp);
+              ResponiveFont.responsive();
+              BotToastInit();
 
-                TBIBFontStyle.h5 = TBIBFontStyle.h5
-                    .copyWith(fontSize: TBIBFontStyle.h5.fontSize!.sp);
-
-                TBIBFontStyle.h6 = TBIBFontStyle.h6
-                    .copyWith(fontSize: TBIBFontStyle.h6.fontSize!.sp);
-                TBIBFontStyle.b1 = TBIBFontStyle.b1
-                    .copyWith(fontSize: TBIBFontStyle.b1.fontSize!.sp);
-                BotToastInit();
-                isOpened = true;
-              }
               child = child; //do something
               child = botToastBuilder(context, child);
               return child;

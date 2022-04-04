@@ -66,6 +66,8 @@ class _GameState extends State<Game> {
                           : cubit.player == 1
                               ? "You Win The Game"
                               : "You Lost - Win Bot : ${cubit.player - 1} ");
+
+                  cubit.calcScore();
                 }
               },
               builder: (BuildContext context, GameStates state) {

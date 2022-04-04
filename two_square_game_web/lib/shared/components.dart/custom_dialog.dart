@@ -1,8 +1,8 @@
+import 'package:choose_two_squares/shared/components.dart/push_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:tbib_dialog/tbib_dialog.dart';
 import 'package:tbib_style/style/font_style.dart';
-import 'package:two_square_game/shared/components.dart/push_page.dart';
 
 import '../../screens/game.dart';
 import '../../screens/menu.dart';

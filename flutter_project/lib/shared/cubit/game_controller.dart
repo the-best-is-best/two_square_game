@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../services/google_play/leaderboard.dart';
 import 'states/game_states.dart';
 
 class Gamecubit extends Cubit<GameStates> {
@@ -27,6 +28,9 @@ class Gamecubit extends Cubit<GameStates> {
   //List<int> HardList;
   bool turnBot = false;
 
+  double _yourScore = 100;
+
+  Stopwatch stopwatch = Stopwatch();
   void closeAd() {
     adLoaded = false;
     emit(ClosedAd());
@@ -52,6 +56,40 @@ class Gamecubit extends Cubit<GameStates> {
     await Future.delayed(const Duration(milliseconds: 500));
     loading = false;
     emit(GamePlayed());
+
+    switch (boardSize) {
+      case 4:
+        _yourScore *= 3;
+        break;
+
+      case 5:
+        switch (numOfPlayer) {
+          case 2:
+            _yourScore *= 3.5;
+            break;
+          case 3:
+            _yourScore *= 4.5;
+            break;
+        }
+
+        break;
+      case 6:
+        switch (numOfPlayer) {
+          case 2:
+            _yourScore *= 4;
+            break;
+          case 3:
+            _yourScore *= 5;
+            break;
+          case 4:
+            _yourScore *= 8;
+            break;
+        }
+
+        break;
+    }
+    print(stopwatch.elapsedMilliseconds);
+    stopwatch.start();
   }
 
   void selectNum(int num) {
@@ -207,5 +245,19 @@ class Gamecubit extends Cubit<GameStates> {
         }
       }
     });
+  }
+
+  void calcScore() {
+    // if (!playWithFriends && player == 1) {
+    stopwatch.stop();
+    print(_yourScore);
+    double mode = boardSize - 3;
+
+    double timeLost = stopwatch.elapsedMilliseconds / (10000 * mode * 2 / 3);
+
+    _yourScore = _yourScore / timeLost;
+    print(_yourScore);
+    // submitScore(_yourScore);
+    //  }
   }
 }

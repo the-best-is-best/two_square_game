@@ -1,20 +1,20 @@
 {
   "project_info": {
-    "project_number": "300159674679",
-    "project_id": "two-square-game",
-    "storage_bucket": "two-square-game.appspot.com"
+    "project_number": "407762021871",
+    "project_id": "choose-two-squares-95959",
+    "storage_bucket": "choose-two-squares-95959.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:300159674679:android:81c6bc15961c64556192b2",
+        "mobilesdk_app_id": "1:407762021871:android:257f6a602d8ef499469a1a",
         "android_client_info": {
           "package_name": "com.hardihood.two_square_game"
         }
       },
       "oauth_client": [
         {
-          "client_id": "300159674679-nj539rledocd0bjdbm8hmaq1ha7o5h3u.apps.googleusercontent.com",
+          "client_id": "407762021871-bm2ocng8uqitq9df5eof7ft8k2181gid.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.hardihood.two_square_game",
@@ -22,25 +22,26 @@
           }
         },
         {
-          "client_id": "300159674679-c9a95rib9bbtq9ti467u19ijv0mn1v3g.apps.googleusercontent.com",
+          "client_id": "407762021871-6cosh4hv3u3kf40h2m37hsa4vbpkm7u3.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAg3csXxPnMBpVU9rvI5aZ8IgcMmBhWras"
+          "current_key": "AIzaSyDVWFHsUkg9ReZyawTJYaE-HO5MENfIKVQ"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "300159674679-c9a95rib9bbtq9ti467u19ijv0mn1v3g.apps.googleusercontent.com",
+              "client_id": "407762021871-6cosh4hv3u3kf40h2m37hsa4vbpkm7u3.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-7284367511062855~8319942170"
     }
   ],
   "configuration_version": "1"

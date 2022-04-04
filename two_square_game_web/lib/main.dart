@@ -4,10 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tbib_style/tbib_style.dart';
-import 'package:two_square_game/screens/splash_screen.dart';
-import 'package:two_square_game/shared/cubit/menu_controller.dart';
 
+import 'screens/splash_screen.dart';
 import 'shared/bloc_observer.dart';
+import 'shared/cubit/menu_controller.dart';
 import 'shared/services/font_services.dart';
 import 'shared/util/device_screen.dart';
 

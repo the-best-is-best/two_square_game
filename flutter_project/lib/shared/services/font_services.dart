@@ -26,8 +26,7 @@ void fontsServices() {
     color: const Color.fromRGBO(206, 222, 235, .5),
   );
 
-  TBIBFontStyle.h6 = TBIBFontStyle.h5.copyWith(
+  TBIBFontStyle.h6 = TBIBFontStyle.h6.copyWith(
     color: const Color.fromRGBO(206, 222, 235, .5),
   );
-  log(TBIBFontStyle.h4.fontSize.toString());
 }
