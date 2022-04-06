@@ -7,8 +7,7 @@ import 'package:two_square_game/shared/components.dart/push_page.dart';
 import '../../screens/game.dart';
 import '../../screens/menu.dart';
 import '../../screens/multiplayer.dart';
-import '../ads/interstitial_ad.dart';
-import '../ads/my_banner_ad.dart';
+
 import '../cubit/menu_controller.dart';
 
 TBIBDialog alertDialog({
@@ -110,13 +109,12 @@ TBIBDialog askQuestions({
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    MyInterstitial.getAd();
-                    MyBannerAd.checkAdLoaded();
+
                     cubitMenu.playWithFriends = true;
                     if (cubitMenu.displayMode != "Easy") {
                       askManyPlayer(
                         context: context,
-                        cubit: cubitMenu,
+                        cubitMenu: cubitMenu,
                       );
                     } else {
                       push(
@@ -133,13 +131,12 @@ TBIBDialog askQuestions({
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    MyInterstitial.getAd();
-                    MyBannerAd.checkAdLoaded();
+
                     cubitMenu.playWithFriends = false;
                     if (cubitMenu.displayMode != "Easy") {
                       askManyPlayer(
                         context: context,
-                        cubit: cubitMenu,
+                        cubitMenu: cubitMenu,
                       );
                     } else {
                       push(
@@ -165,11 +162,11 @@ TBIBDialog askQuestions({
 
 TBIBDialog askManyPlayer({
   required BuildContext context,
-  required Menucubit cubit,
+  required Menucubit cubitMenu,
   bool isMulti = false,
 }) {
   int buttonsPlayerSelector = 2;
-  switch (cubit.displayMode) {
+  switch (cubitMenu.displayMode) {
     case "Medium":
       buttonsPlayerSelector = 2;
       break;
@@ -200,7 +197,9 @@ TBIBDialog askManyPlayer({
           children: [
             const Padding(padding: EdgeInsets.symmetric(vertical: 15)),
             Text(
-              'How many players?',
+              !cubitMenu.playWithFriends
+                  ? "How Many Bots"
+                  : 'How many players?',
               style: TBIBFontStyle.h5,
             ),
             const Padding(padding: EdgeInsets.symmetric(vertical: 15)),
@@ -211,21 +210,22 @@ TBIBDialog askManyPlayer({
                   ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        MyInterstitial.getAd();
-                        MyBannerAd.checkAdLoaded();
-                        cubit.numberOfPlayer = i + 2;
+
+                        cubitMenu.numberOfPlayer = i + 2;
                         push(
                           context: context,
                           widget: isMulti
-                              ? MultiPlayer(cubit.boardSize, i + 2)
+                              ? MultiPlayer(cubitMenu.boardSize, i + 2)
                               : Game(
-                                  boardSize: cubit.boardSize,
-                                  numberOfPlayer: cubit.numberOfPlayer,
-                                  playWithFriends: cubit.playWithFriends,
+                                  boardSize: cubitMenu.boardSize,
+                                  numberOfPlayer: cubitMenu.numberOfPlayer,
+                                  playWithFriends: cubitMenu.playWithFriends,
                                 ),
                         );
                       },
-                      child: Text((i + 2).toString()))
+                      child: !cubitMenu.playWithFriends
+                          ? Text((i + 1).toString())
+                          : Text((i + 2).toString()))
               ],
             ),
             const Padding(padding: EdgeInsets.symmetric(vertical: 5)),

@@ -51,7 +51,7 @@ dependencies:
   firebase_analytics: ^9.1.2
   dio: ^4.0.4
   package_info_plus: ^1.4.0
-  google_mobile_ads: ^1.1.0
+  google_mobile_ads: ^1.2.0
   timer_count_down: ^2.2.1
   flutter_screenutil: ^5.3.1
   url_launcher: ^6.0.20
@@ -59,7 +59,8 @@ dependencies:
   google_api_availability: ^3.0.1
   simple_connection_checker: ^0.2.1
   wakelock: ^0.6.1+2
-  games_services: ^2.0.7
+ # games_services: ^2.0.7
+  play_game_service: ^0.2.5
   font_awesome_flutter: ^10.1.0
 dev_dependencies:
   flutter_test:

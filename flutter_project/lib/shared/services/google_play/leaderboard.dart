@@ -1,17 +1,13 @@
-import 'package:games_services/games_services.dart';
+import 'package:play_game_service/play_game_service.dart';
 
 void openLeaderBoard() async {
-  if (!await GamesServices.isSignedIn) {
-    GamesServices.signIn().then((value) => GamesServices.showLeaderboards(
-        androidLeaderboardID: 'CgkI79uKhO8LEAIQAg'));
-  } else {
-    GamesServices.showLeaderboards(androidLeaderboardID: 'CgkI79uKhO8LEAIQAg');
-  }
+  await PlayGameService.signIn(scopeSnapShot: false);
+
+  PlayGameService.showLeaderboards();
 }
 
-void submitScore(double score) {
-  GamesServices.submitScore(
-    score:
-        Score(androidLeaderboardID: 'CgkI79uKhO8LEAIQAg', value: score.round()),
-  );
+void submitScore({required String leaderBoardId, required double score}) async {
+  await PlayGameService.signIn(scopeSnapShot: false);
+
+  PlayGameService.submitScore(leaderBoardId, score.round());
 }

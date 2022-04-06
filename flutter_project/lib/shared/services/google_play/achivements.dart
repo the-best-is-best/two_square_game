@@ -1,9 +1,7 @@
-import 'package:games_services/games_services.dart';
+import 'package:play_game_service/play_game_service.dart';
 
 void openAchivement() async {
-  if (!await GamesServices.isSignedIn) {
-    GamesServices.signIn().then((value) => GamesServices.showAchievements());
-  } else {
-    GamesServices.showAchievements();
-  }
+  await PlayGameService.signIn(scopeSnapShot: false);
+
+  PlayGameService.showAchievements();
 }

@@ -206,7 +206,7 @@ class _MenuState extends State<Menu> {
                                             askManyPlayer(
                                                 isMulti: true,
                                                 context: context,
-                                                cubit: cubit);
+                                                cubitMenu: cubit);
                                           }
                                           await Wakelock.enabled;
                                           cubit.multiPlayerClick(false);

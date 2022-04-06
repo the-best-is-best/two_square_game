@@ -47,7 +47,9 @@ class _GameState extends State<Game> {
               listener: (BuildContext context, GameStates state) async {
                 if (state is CannotPlayHere) {
                   BotToast.showText(
-                      text: "you can't play here player: ${cubit.player}");
+                      text: cubit.playWithFriends
+                          ? "you can't play here player: ${cubit.player}"
+                          : "you can't play here ");
                 }
                 if (state is DrawGame) {
                   cubit.closeAd();
@@ -63,9 +65,9 @@ class _GameState extends State<Game> {
                       context: context,
                       meesage: cubit.playWithFriends
                           ? "player:  ${cubit.player} Win The Game"
-                          : cubit.player == 1
+                          : cubit.player == cubit.yourTurn
                               ? "You Win The Game"
-                              : "You Lost - Win Bot : ${cubit.player - 1} ");
+                              : "You Lost - Win Bot : ${cubit.player} ");
 
                   cubit.calcScore();
                 }
@@ -94,9 +96,9 @@ class _GameState extends State<Game> {
                                 Text(
                                   cubit.playWithFriends
                                       ? "Current Player ${cubit.player}"
-                                      : cubit.player == 1
+                                      : cubit.player == cubit.yourTurn
                                           ? "Your Turn "
-                                          : "Current Bot ${cubit.player - 1}",
+                                          : "Current Bot ${cubit.player}",
                                   style: TBIBFontStyle.b1,
                                 ),
                                 Padding(
@@ -128,7 +130,7 @@ class _GameState extends State<Game> {
                                                     : () {
                                                         cubit.selectNum(i + 1);
                                                       }
-                                                : cubit.player == 1
+                                                : cubit.player == cubit.yourTurn
                                                     ? cubit.number1() == i + 1
                                                         ? null
                                                         : () {

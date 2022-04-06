@@ -2,7 +2,7 @@
 <!--Google Play game services IDs. Save this file as res/values/games-ids.xml in your project.-->
 <resources>
   <!--game_services_project_id-->
-  <string name="game_services_project_id" translatable="false">407762021871</string>
+  <string name="app_id" translatable="false">407762021871</string>
   <!--package_name-->
   <string name="package_name" translatable="false">com.hardihood.two_square_game</string>
   <!--achievement Start To Play-->

@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../services/google_play/leaderboard.dart';
+import 'package:two_square_game/shared/services/google_play/save_data.dart';
+import '../models/your_data.dart';
+import '../services/google_play/control_google_play.dart';
 import 'states/game_states.dart';
 
 class Gamecubit extends Cubit<GameStates> {
@@ -13,6 +15,7 @@ class Gamecubit extends Cubit<GameStates> {
 
   List<String> board = [];
   int player = 1;
+  late int yourTurn;
 
   int numberOfPlayer = 2;
 
@@ -25,10 +28,8 @@ class Gamecubit extends Cubit<GameStates> {
   int totalGameNum = 0;
 
   late List<List<int>> availableGame;
-  //List<int> HardList;
-  bool turnBot = false;
 
-  double _yourScore = 100;
+  late double _yourScore;
 
   Stopwatch stopwatch = Stopwatch();
   void closeAd() {
@@ -55,41 +56,23 @@ class Gamecubit extends Cubit<GameStates> {
     }
     await Future.delayed(const Duration(milliseconds: 500));
     loading = false;
-    emit(GamePlayed());
+    if (!playWithFriends) {
+      _yourScore = ((boardSize * numOfPlayer) / (boardSize + numOfPlayer)) *
+          pow(10 * numOfPlayer / 2, numOfPlayer);
 
-    switch (boardSize) {
-      case 4:
-        _yourScore *= 3;
-        break;
+      if (boardSize == 4) {
+        _yourScore *= 2;
+      }
+      Random ran = Random();
+      yourTurn = ran.nextInt(numOfPlayer) + 1;
 
-      case 5:
-        switch (numOfPlayer) {
-          case 2:
-            _yourScore *= 3.5;
-            break;
-          case 3:
-            _yourScore *= 4.5;
-            break;
-        }
+      if (yourTurn != 1) {
+        _action(null, null);
+      }
 
-        break;
-      case 6:
-        switch (numOfPlayer) {
-          case 2:
-            _yourScore *= 4;
-            break;
-          case 3:
-            _yourScore *= 5;
-            break;
-          case 4:
-            _yourScore *= 8;
-            break;
-        }
-
-        break;
+      stopwatch.start();
     }
-    print(stopwatch.elapsedMilliseconds);
-    stopwatch.start();
+    emit(GamePlayed());
   }
 
   void selectNum(int num) {
@@ -107,84 +90,115 @@ class Gamecubit extends Cubit<GameStates> {
     _number1 = _number2 = null;
   }
 
-  void _action(action1, action2) {
-    if (board[action1 - 1] != "x" && board[action2 - 1] != "x") {
-      if ((action2 - action1).abs() == boardSize ||
-          (action2 - action1).abs() == 1) {
-        if (action1 != totalGameNum || action2 != totalGameNum) {
-          if (action1 % boardSize == 0 && action2 == action1 + 1 ||
-              action2 % boardSize == 0 && action1 == action2 + 1) {
-            emit(CannotPlayHere());
+  void _action(int? action1, int? action2) {
+    if (action1 == null && action2 == null) {
+      availableGame =
+          List.generate(totalGameNum, (i) => List.generate(4, (i) => 0));
+      for (int i = 0; i < board.length; i++) {
+        if ((i + 1) % boardSize != 0) {
+          if ((i + 1) < totalGameNum) {
+            availableGame[i][0] = i + 2;
+          }
+        }
+
+        if ((i) % (boardSize) != 0) {
+          if ((i - 1) >= 0) {
+            availableGame[i][1] = i;
+          }
+        }
+
+        if ((i - boardSize) >= 0) {
+          availableGame[i][2] = i + 1 - boardSize;
+        }
+
+        if ((i + boardSize) < totalGameNum) {
+          availableGame[i][3] = i + 1 + boardSize;
+        }
+      }
+
+      aiPlay();
+      emit(GamePlayed());
+    } else {
+      if (board[action1! - 1] != "x" && board[action2! - 1] != "x") {
+        if ((action2 - action1).abs() == boardSize ||
+            (action2 - action1).abs() == 1) {
+          if (action1 != totalGameNum || action2 != totalGameNum) {
+            if (action1 % boardSize == 0 && action2 == action1 + 1 ||
+                action2 % boardSize == 0 && action1 == action2 + 1) {
+              emit(CannotPlayHere());
+
+              return;
+            }
+          }
+          stopwatch.stop();
+
+          board[action1 - 1] = "x";
+          board[action2 - 1] = "x";
+          availableGame =
+              List.generate(totalGameNum, (i) => List.generate(4, (i) => 0));
+          bool turns = false;
+          bool draw = true;
+
+          for (int i = 0; i < board.length; i++) {
+            if (board[i] != "x") {
+              draw = false;
+
+              if ((i + 1) % boardSize != 0) {
+                if ((i + 1) < totalGameNum && board[i + 1] != "x") {
+                  turns = true;
+                  availableGame[i][0] = i + 2;
+                }
+              }
+
+              if ((i) % (boardSize) != 0) {
+                if ((i - 1) >= 0 && board[i - 1] != "x") {
+                  turns = true;
+                  availableGame[i][1] = i;
+                }
+              }
+
+              if ((i - boardSize) >= 0 && board[i - boardSize] != "x") {
+                turns = true;
+                availableGame[i][2] = i + 1 - boardSize;
+              }
+
+              if ((i + boardSize) < totalGameNum &&
+                  board[i + boardSize] != "x") {
+                turns = true;
+                availableGame[i][3] = i + 1 + boardSize;
+              }
+            }
+          }
+          if (draw == true) {
+            emit(DrawGame());
 
             return;
           }
-        }
 
-        board[action1 - 1] = "x";
-        board[action2 - 1] = "x";
-        availableGame =
-            List.generate(totalGameNum, (i) => List.generate(4, (i) => 0));
-        bool turns = false;
-        bool draw = true;
-
-        for (int i = 0; i < board.length; i++) {
-          if (board[i] != "x") {
-            draw = false;
-            //   int numberOfPlayes = 0;
-
-            if ((i + 1) % boardSize != 0) {
-              if ((i + 1) < totalGameNum && board[i + 1] != "x") {
-                turns = true;
-                availableGame[i][0] = i + 2;
-                //    availableGame.add([i + 1, i + 2]);
-              }
+          if (turns) {
+            if (player == numberOfPlayer) {
+              player = 1;
+            } else {
+              player++;
             }
-
-            if ((i) % (boardSize) != 0) {
-              if ((i - 1) >= 0 && board[i - 1] != "x") {
-                turns = true;
-                availableGame[i][1] = i;
-                //    availableGame.add([i + 1, i]);
-              }
-            }
-
-            if ((i - boardSize) >= 0 && board[i - boardSize] != "x") {
-              turns = true;
-              availableGame[i][2] = i + 1 - boardSize;
-              //  availableGame.add([i + 1, i + 1 - boardSize]);
-            }
-
-            if ((i + boardSize) < totalGameNum && board[i + boardSize] != "x") {
-              turns = true;
-              availableGame[i][3] = i + 1 + boardSize;
-              //availableGame.add([i + 1, i + 1 + boardSize]);
-            }
-          }
-        }
-        if (draw == true) {
-          emit(DrawGame());
-
-          return;
-        }
-
-        if (turns) {
-          emit(GamePlayed());
-          if (player == numberOfPlayer) {
-            player = 1;
-          } else {
-            player++;
             if (!playWithFriends) {
-              aiPlay();
+              if (player != yourTurn) {
+                aiPlay();
+              }
+              stopwatch.start();
+              try {
+                emit(GamePlayed());
+              } catch (_) {}
             }
+          } else {
+            emit(WinGame());
           }
         } else {
-          emit(WinGame());
+          emit(CannotPlayHere());
         }
       } else {
         emit(CannotPlayHere());
       }
-    } else {
-      emit(CannotPlayHere());
     }
   }
 
@@ -248,16 +262,26 @@ class Gamecubit extends Cubit<GameStates> {
   }
 
   void calcScore() {
-    // if (!playWithFriends && player == 1) {
-    stopwatch.stop();
-    print(_yourScore);
-    double mode = boardSize - 3;
+    if (!playWithFriends && player == yourTurn) {
+      stopwatch.stop();
+      double mode = boardSize - 3;
+      double timeLost = stopwatch.elapsedMilliseconds / (10000 * mode * 2 / 3);
 
-    double timeLost = stopwatch.elapsedMilliseconds / (10000 * mode * 2 / 3);
+      _yourScore = _yourScore / timeLost;
 
-    _yourScore = _yourScore / timeLost;
-    print(_yourScore);
-    // submitScore(_yourScore);
-    //  }
+      if (mode != 1) {
+        if (numberOfPlayer == 2) {
+          _yourScore *= mode == 2 ? 3 : 5;
+        }
+        if (yourTurn == 1 || yourTurn == numberOfPlayer) {
+          _yourScore *= 2;
+        }
+      }
+
+      YourData.score += _yourScore.round();
+      achivLeader(mode: mode, numberOfPlayer: numberOfPlayer);
+
+      saveDataGooglePaly();
+    }
   }
 }
