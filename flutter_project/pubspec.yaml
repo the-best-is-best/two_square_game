@@ -59,7 +59,7 @@ dependencies:
   google_api_availability: ^3.0.1
   simple_connection_checker: ^0.2.1
   wakelock: ^0.6.1+2
- # games_services: ^2.0.7
+  games_services: ^2.0.7
   play_game_service: ^0.2.5
   font_awesome_flutter: ^10.1.0
 dev_dependencies:

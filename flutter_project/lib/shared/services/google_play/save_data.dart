@@ -5,7 +5,7 @@ import 'package:play_game_service/play_game_service.dart';
 import 'package:two_square_game/shared/models/your_data.dart';
 
 void saveDataGooglePaly() async {
-  await PlayGameService.signIn(scopeSnapShot: false);
+  await PlayGameService.signIn(scopeSnapShot: true);
   Uint8List data = Uint8List(4);
   data[0] = YourData.score;
   data[1] = YourData.winMedium3;

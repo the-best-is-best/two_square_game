@@ -164,6 +164,7 @@ class _MenuState extends State<Menu> {
                                 onPressed: cubit.multiClicked
                                     ? null
                                     : () async {
+                                        cubit.playWithFriends = true;
                                         cubit.multiPlayerClick(true);
 
                                         await CheckInternet.init();
