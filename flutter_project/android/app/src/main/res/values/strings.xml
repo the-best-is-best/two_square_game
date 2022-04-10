@@ -1,10 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--Google Play game services IDs. Save this file as res/values/games-ids.xml in your project.-->
 <resources>
-  <!--game_services_project_id-->
+  <!--app_id-->
   <string name="app_id" translatable="false">407762021871</string>
   <!--package_name-->
   <string name="package_name" translatable="false">com.hardihood.two_square_game</string>
-  <!--achievement Start To Play-->
-  <string name="achievement_start_to_play" translatable="false">CgkI79uKhO8LEAIQAQ</string>
+  <!--achievement Win Easy-->
+  <string name="achievement_win_easy" translatable="false">CgkI79uKhO8LEAIQCA</string>
+  <!--achievement 2 Med 1-->
+  <string name="achievement_2_med_1" translatable="false">CgkI79uKhO8LEAIQCQ</string>
+  <!--achievement 2 Hard 1-->
+  <string name="achievement_2_hard_1" translatable="false">CgkI79uKhO8LEAIQCg</string>
+  <!--achievement 3 Hard 1-->
+  <string name="achievement_3_hard_1" translatable="false">CgkI79uKhO8LEAIQCw</string>
+  <!--achievement 2 Med 5-->
+  <string name="achievement_2_med_5" translatable="false">CgkI79uKhO8LEAIQDA</string>
+  <!--achievement 2 Hard 10-->
+  <string name="achievement_2_hard_10" translatable="false">CgkI79uKhO8LEAIQDQ</string>
+  <!--achievement 3 Hard 25-->
+  <string name="achievement_3_hard_25" translatable="false">CgkI79uKhO8LEAIQDg</string>
+  <!--achievement 3 Hard 50-->
+  <string name="achievement_3_hard_50" translatable="false">CgkI79uKhO8LEAIQDw</string>
+  <!--leaderboard High Score-->
+  <string name="leaderboard_high_score" translatable="false">CgkI79uKhO8LEAIQEA</string>
+  <!--leaderboard Medium 2 Bots-->
+  <string name="leaderboard_medium_2_bots" translatable="false">CgkI79uKhO8LEAIQEQ</string>
+  <!--leaderboard Hard 2 Bots-->
+  <string name="leaderboard_hard_2_bots" translatable="false">CgkI79uKhO8LEAIQEg</string>
+  <!--leaderboard Hard 3 Bots-->
+  <string name="leaderboard_hard_3_bots" translatable="false">CgkI79uKhO8LEAIQEw</string>
 </resources>

@@ -5,14 +5,14 @@ import 'achivements.dart';
 
 void achivLeader({required double mode, required int numberOfPlayer}) {
   submitLeaderBoardScore(
-      leaderBoardId: "CgkI79uKhO8LEAIQAg", score: YourData.score.toDouble());
+      leaderBoardId: "CgkI79uKhO8LEAIQEA", score: YourData.score.toDouble());
   if (mode == 1) {
     submitArchivemetScore(achivementId: "CgkI79uKhO8LEAIQCA", isInc: false);
   }
   if (mode == 2 && numberOfPlayer == 3) {
     YourData.winMedium3 += 1;
     submitLeaderBoardScore(
-        leaderBoardId: "CgkI79uKhO8LEAIQBQ",
+        leaderBoardId: "CgkI79uKhO8LEAIQEQ",
         score: YourData.winMedium3.toDouble());
     submitArchivemetScore(achivementId: "CgkI79uKhO8LEAIQCQ", isInc: false);
     submitArchivemetScore(achivementId: "CgkI79uKhO8LEAIQDA", isInc: true);
@@ -20,7 +20,7 @@ void achivLeader({required double mode, required int numberOfPlayer}) {
     YourData.winHard3 += 1;
 
     submitLeaderBoardScore(
-        leaderBoardId: "CgkI79uKhO8LEAIQBg",
+        leaderBoardId: "CgkI79uKhO8LEAIQEg",
         score: YourData.winHard3.toDouble());
 
     submitArchivemetScore(achivementId: "CgkI79uKhO8LEAIQCg", isInc: false);
@@ -28,7 +28,7 @@ void achivLeader({required double mode, required int numberOfPlayer}) {
   } else if (mode == 3 && numberOfPlayer == 4) {
     YourData.winHard4 += 1;
     submitLeaderBoardScore(
-        leaderBoardId: "CgkI79uKhO8LEAIQBw",
+        leaderBoardId: "CgkI79uKhO8LEAIQEw",
         score: YourData.winHard4.toDouble());
 
     submitArchivemetScore(achivementId: "CgkI79uKhO8LEAIQCw", isInc: false);

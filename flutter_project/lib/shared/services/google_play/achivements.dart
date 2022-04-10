@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:games_services/games_services.dart';
 import 'package:play_game_service/play_game_service.dart';
 

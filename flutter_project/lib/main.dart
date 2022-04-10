@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_api_availability/google_api_availability.dart';
-import 'package:play_game_service/play_game_service.dart';
 import 'package:tbib_style/responsive_font.dart';
 import 'package:two_square_game/screens/splash_screen.dart';
 import 'package:two_square_game/shared/cubit/menu_controller.dart';
@@ -17,7 +16,6 @@ import 'package:two_square_game/shared/network/dio_network.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:two_square_game/shared/services/check_internet.dart';
 import 'package:two_square_game/shared/services/firebase_services.dart';
-import 'package:two_square_game/shared/services/google_play/save_data.dart';
 
 import 'shared/bloc_observer.dart';
 import 'shared/services/alert_google_services.dart';
@@ -32,9 +30,6 @@ const _kTestingCrashlytics = true;
 Future<void> main() async {
   await runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
-    PlayGameService.signIn(scopeSnapShot: true)
-        .then((_) => loadDataGooglePlay());
-
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
