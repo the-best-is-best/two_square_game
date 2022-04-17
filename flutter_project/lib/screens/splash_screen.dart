@@ -3,6 +3,7 @@ import 'package:games_services/games_services.dart';
 import 'package:play_game_service/play_game_service.dart';
 import 'package:tbib_splash_screen/splash_screen.dart';
 
+import '../shared/services/google_play/save_data.dart';
 import 'menu.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     GamesServices.signIn();
-    PlayGameService.signIn();
+    PlayGameService.signIn().then((value) => loadDataGooglePlay());
   }
 
   @override

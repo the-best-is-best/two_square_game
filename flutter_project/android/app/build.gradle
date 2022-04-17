@@ -88,10 +88,15 @@ android {
         release {
             // TODO: Add your own signing config for the release build.
             //Signing with the debug keys for now, so `flutter run --release` works.
-             debuggable false
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+           
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro' 
+            debuggable false
+            jniDebuggable false
+            renderscriptDebuggable false
+            pseudoLocalesEnabled false
+            zipAlignEnabled true
             signingConfig signingConfigs.release
         }
     }
@@ -107,4 +112,5 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'androidx.work:work-runtime-ktx:2.7.0'
     implementation 'com.google.android.gms:play-services-ads:20.6.0'
+
 }

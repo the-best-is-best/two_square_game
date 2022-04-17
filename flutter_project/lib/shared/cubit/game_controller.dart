@@ -184,12 +184,11 @@ class Gamecubit extends Cubit<GameStates> {
             if (!playWithFriends) {
               if (player != yourTurn) {
                 aiPlay();
+              } else {
+                stopwatch.start();
               }
-              stopwatch.start();
-              try {
-                emit(GamePlayed());
-              } catch (_) {}
             }
+            emit(GamePlayed());
           } else {
             emit(WinGame());
           }
@@ -261,7 +260,7 @@ class Gamecubit extends Cubit<GameStates> {
     });
   }
 
-  void calcScore() {
+  void calcScore() async {
     if (!playWithFriends && player == yourTurn) {
       stopwatch.stop();
       double mode = boardSize - 3;
@@ -277,35 +276,16 @@ class Gamecubit extends Cubit<GameStates> {
           _yourScore *= 2;
         }
       }
-
-      YourData.score += _yourScore.round();
-      achivLeader(mode: mode, numberOfPlayer: numberOfPlayer);
-
-      saveDataGooglePaly();
-    }
-  }
-
-  void unlocArchiv() {
-    if (!playWithFriends && player == yourTurn) {
-      stopwatch.stop();
-      double mode = boardSize - 3;
-      double timeLost = stopwatch.elapsedMilliseconds / (10000 * mode * 2 / 3);
-
-      _yourScore = _yourScore / timeLost;
-
-      if (mode != 1) {
-        if (numberOfPlayer == 2) {
-          _yourScore *= mode == 2 ? 3 : 5;
-        }
-        if (yourTurn == 1 || yourTurn == numberOfPlayer) {
-          _yourScore *= 2;
-        }
+      int _score = YourData.score;
+      if (_score + _yourScore > _score) {
+        _score += _yourScore.round();
+      } else {
+        _score += (50 * mode).toInt();
       }
+      YourData.score = _score;
 
-      YourData.score += _yourScore.round();
-      achivLeader(mode: mode, numberOfPlayer: numberOfPlayer);
-
-      saveDataGooglePaly();
+      await saveDataGooglePaly();
+      await achivLeader(mode: mode, numberOfPlayer: numberOfPlayer);
     }
   }
 }

@@ -7,16 +7,14 @@ void openAchivement() async {
   PlayGameService.showAchievements();
 }
 
-void submitArchivemetScore(
+Future submitArchivemetScore(
     {required String achivementId, required bool isInc}) async {
-  await PlayGameService.signIn(scopeSnapShot: true);
   if (!isInc) {
-    GamesServices.signIn().then((value) => GamesServices.unlock(
-            achievement: Achievement(
-          androidID: achivementId,
-        )).then((value) => GamesServices.signOut()));
+    GamesServices.unlock(
+        achievement: Achievement(
+      androidID: achivementId,
+    ));
   } else {
-    PlayGameService.signIn()
-        .then((value) => PlayGameService.increment(achivementId));
+    PlayGameService.increment(achivementId);
   }
 }
