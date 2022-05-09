@@ -124,7 +124,7 @@ packages:
       name: flutter_screenutil
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.3.1"
+    version: "5.5.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -300,7 +300,7 @@ packages:
       path: "../../../../tbib_library/tbib_style"
       relative: true
     source: path
-    version: "1.0.4"
+    version: "2.0.0"
   term_glyph:
     dependency: transitive
     description:

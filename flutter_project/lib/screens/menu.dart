@@ -34,10 +34,13 @@ class _MenuState extends State<Menu> {
   @override
   void initState() {
     super.initState();
-    MyInterstitial.init();
-    WidgetsBinding.instance!.addPostFrameCallback((_) => Future.delayed(
-        const Duration(milliseconds: 500),
-        () => MyInterstitial.getInterstitialAd()?.show()));
+    if (GoogleServesesChecker.getPlaSytoreAvailability ==
+        GooglePlayServicesAvailability.success) {
+      MyInterstitial.init();
+      WidgetsBinding.instance!.addPostFrameCallback((_) => Future.delayed(
+          const Duration(milliseconds: 500),
+          () => MyInterstitial.getInterstitialAd()?.show()));
+    }
   }
 
   @override
@@ -133,8 +136,13 @@ class _MenuState extends State<Menu> {
                               onPressed: cubit.multiClicked
                                   ? null
                                   : () async {
-                                      MyInterstitial.getAd();
-                                      MyBannerAd.checkAdLoaded();
+                                      if (GoogleServesesChecker
+                                              .getPlaSytoreAvailability ==
+                                          GooglePlayServicesAvailability
+                                              .success) {
+                                        MyInterstitial.getAd();
+                                        MyBannerAd.checkAdLoaded();
+                                      }
                                       askQuestions(
                                         context: context,
                                         cubitMenu: cubit,
@@ -166,8 +174,12 @@ class _MenuState extends State<Menu> {
                                     : () async {
                                         cubit.playWithFriends = true;
                                         cubit.multiPlayerClick(true);
-
-                                        await CheckInternet.init();
+                                        if (GoogleServesesChecker
+                                                .getPlaSytoreAvailability ==
+                                            GooglePlayServicesAvailability
+                                                .success) {
+                                          await CheckInternet.init();
+                                        }
                                         if (FirebaseInit.token == null &&
                                             CheckInternet.isConnected) {
                                           if (CheckInternet.isConnected &&

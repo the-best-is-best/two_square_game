@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -33,14 +34,17 @@ Future<void> main() async {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
+    // You can also query the latest version available for a specific package.
     await CheckInternet.init();
     await GoogleServesesChecker.init();
     await FirebaseInit.firebaseServices(
         GoogleServesesChecker.getPlaSytoreAvailability,
         CheckInternet.isConnected);
 
-    MobileAds.instance.initialize();
-
+    if (GoogleServesesChecker.getPlaSytoreAvailability ==
+        GooglePlayServicesAvailability.success) {
+      MobileAds.instance.initialize();
+    }
     DeviceType();
     fontsServices();
     DioHelper();
@@ -152,10 +156,23 @@ class _MyAppState extends State<MyApp> {
               //primaryColor: HexColor("cedeeb"),
 
               elevatedButtonTheme: ElevatedButtonThemeData(
-                  style: ElevatedButton.styleFrom(
-                //primary: const Color.fromRGBO(206, 222, 235, .5)
-                primary: const Color.fromRGBO(182, 82, 81, 1),
-              )),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.pressed)) {
+                        return const Color.fromRGBO(182, 82, 81, .3);
+                      } else if (states.contains(MaterialState.disabled)) {
+                        return const Color.fromRGBO(182, 82, 81, .8);
+                      } else {
+                        return const Color.fromRGBO(182, 82, 81, 1);
+                      }
+                      // Use the component's default.
+                    },
+                  ),
+
+                  //  primary: const Color.fromRGBO(182, 82, 81, 1),
+                ),
+              ),
             ),
             home: FutureBuilder(
               future: _initializeFlutterFireFuture ?? firebaseError(),

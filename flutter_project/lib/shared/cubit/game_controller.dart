@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tbib_gms_google_play/tbib_gms_google_play.dart';
 import 'package:two_square_game/shared/services/google_play/save_data.dart';
 import '../models/your_data.dart';
 import '../services/google_play/control_google_play.dart';
@@ -262,30 +263,40 @@ class Gamecubit extends Cubit<GameStates> {
 
   void calcScore() async {
     if (!playWithFriends && player == yourTurn) {
-      stopwatch.stop();
-      double mode = boardSize - 3;
-      double timeLost = stopwatch.elapsedMilliseconds / (10000 * mode * 2 / 3);
-
-      _yourScore = _yourScore / timeLost;
-
-      if (mode != 1) {
-        if (numberOfPlayer == 2) {
-          _yourScore *= mode == 2 ? 3 : 5;
+      try {
+        if (!await TBIBGMSGooglePlay.isSignedIn) {
+          await TBIBGMSGooglePlay.signIn();
         }
-        if (yourTurn == 1 || yourTurn == numberOfPlayer) {
-          _yourScore *= 2;
-        }
-      }
-      int _score = YourData.score;
-      if (_score + _yourScore > _score) {
-        _score += _yourScore.round();
-      } else {
-        _score += (50 * mode).toInt();
-      }
-      YourData.score = _score;
+        bool success = await loadDataGooglePlay();
+        stopwatch.stop();
+        if (success) {
+          double mode = boardSize - 3;
+          double timeLost =
+              stopwatch.elapsedMilliseconds / (10000 * mode * 2 / 3);
 
-      await saveDataGooglePaly();
-      await achivLeader(mode: mode, numberOfPlayer: numberOfPlayer);
+          _yourScore = _yourScore / timeLost;
+
+          if (mode != 1) {
+            if (numberOfPlayer == 2) {
+              _yourScore *= mode == 2 ? 3 : 5;
+            }
+            if (yourTurn == 1 || yourTurn == numberOfPlayer) {
+              _yourScore *= 2;
+            }
+          }
+          int _score = YourData.score;
+          if (_score + _yourScore > _score) {
+            _score += _yourScore.round();
+          } else {
+            _score += (50 * mode).toInt();
+          }
+          YourData.score = _score;
+
+          await saveDataGooglePaly();
+
+          await achivLeader(mode: mode, numberOfPlayer: numberOfPlayer);
+        }
+      } catch (_) {}
     }
   }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:games_services/games_services.dart';
-import 'package:play_game_service/play_game_service.dart';
+import 'package:google_api_availability/google_api_availability.dart';
+import 'package:tbib_gms_google_play/tbib_gms_google_play.dart';
 import 'package:tbib_splash_screen/splash_screen.dart';
 
+import '../shared/services/alert_google_services.dart';
 import '../shared/services/google_play/save_data.dart';
 import 'menu.dart';
 
@@ -17,8 +18,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    GamesServices.signIn();
-    PlayGameService.signIn().then((value) => loadDataGooglePlay());
+    try {
+      if (GoogleServesesChecker.getPlaSytoreAvailability ==
+          GooglePlayServicesAvailability.success) {
+        TBIBGMSGooglePlay.signIn().then((value) {
+          loadDataGooglePlay();
+        });
+      }
+    } catch (_) {}
   }
 
   @override

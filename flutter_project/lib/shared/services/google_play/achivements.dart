@@ -1,20 +1,24 @@
-import 'package:games_services/games_services.dart';
-import 'package:play_game_service/play_game_service.dart';
+import 'package:tbib_gms_google_play/tbib_gms_google_play.dart';
 
 void openAchivement() async {
-  await PlayGameService.signIn(scopeSnapShot: true);
+  if (!await TBIBGMSGooglePlay.isSignedIn) {
+    await TBIBGMSGooglePlay.signIn();
+  }
 
-  PlayGameService.showAchievements();
+  TBIBGMSGooglePlay.showAchievements();
 }
 
 Future submitArchivemetScore(
     {required String achivementId, required bool isInc}) async {
+  if (!await TBIBGMSGooglePlay.isSignedIn) {
+    await TBIBGMSGooglePlay.signIn();
+  }
+
   if (!isInc) {
-    GamesServices.unlock(
-        achievement: Achievement(
-      androidID: achivementId,
-    ));
+    TBIBGMSGooglePlay.unlock(
+      achievement: Achievement(androidID: achivementId),
+    );
   } else {
-    PlayGameService.increment(achivementId);
+    TBIBGMSGooglePlay.increment(achivementId);
   }
 }

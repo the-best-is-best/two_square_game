@@ -229,7 +229,7 @@ packages:
       name: flutter_screenutil
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.3.1"
+    version: "5.5.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -247,20 +247,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "10.1.0"
-  games_services:
-    dependency: "direct main"
-    description:
-      name: games_services
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.7"
-  games_services_platform_interface:
-    dependency: transitive
-    description:
-      name: games_services_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.5"
   google_api_availability:
     dependency: "direct main"
     description:
@@ -415,13 +401,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.4.0"
-  play_game_service:
-    dependency: "direct main"
-    description:
-      name: play_game_service
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.5"
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -487,6 +466,13 @@ packages:
     dependency: "direct main"
     description:
       path: "../../../../tbib_library/tbib_dialog"
+      relative: true
+    source: path
+    version: "0.0.1"
+  tbib_gms_google_play:
+    dependency: "direct main"
+    description:
+      path: "../../../../tbib_library/tbib_gms_google_play"
       relative: true
     source: path
     version: "0.0.1"
@@ -666,5 +652,5 @@ packages:
     source: hosted
     version: "8.0.0"
 sdks:
-  dart: ">=2.16.1 <3.0.0"
+  dart: ">=2.16.2 <3.0.0"
   flutter: ">=2.10.0"

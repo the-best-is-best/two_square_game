@@ -2,6 +2,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:buildcondition/buildcondition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_api_availability/google_api_availability.dart';
 import 'package:tbib_style/tbib_style.dart';
 
 import '../shared/components.dart/app_bar.dart';
@@ -9,6 +10,7 @@ import '../shared/components.dart/custom_dialog.dart';
 import '../shared/ads/my_banner_ad.dart';
 import '../shared/cubit/game_controller.dart';
 import '../shared/cubit/states/game_states.dart';
+import '../shared/services/alert_google_services.dart';
 
 class Game extends StatefulWidget {
   final int boardSize;
@@ -68,8 +70,10 @@ class _GameState extends State<Game> {
                           : cubit.player == cubit.yourTurn
                               ? "You Win The Game"
                               : "You Lost - Win Bot : ${cubit.player} ");
-
-                  cubit.calcScore();
+                  if (GoogleServesesChecker.getPlaSytoreAvailability ==
+                      GooglePlayServicesAvailability.success) {
+                    cubit.calcScore();
+                  }
                 }
               },
               builder: (BuildContext context, GameStates state) {
@@ -116,14 +120,43 @@ class _GameState extends State<Game> {
                                         Padding(
                                           padding: const EdgeInsets.all(4.0),
                                           child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                                primary: cubit.board[i] == "x"
-                                                    ? const Color.fromRGBO(
-                                                        182, 82, 81, .5)
-                                                    : null,
-                                                padding:
-                                                    const EdgeInsets.all(0),
-                                                textStyle: TBIBFontStyle.b1),
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty
+                                                      .resolveWith<Color>(
+                                                (Set<MaterialState> states) {
+                                                  if (states.contains(
+                                                      MaterialState.pressed)) {
+                                                    return const Color.fromRGBO(
+                                                        182, 82, 81, .6);
+                                                  } else if (states.contains(
+                                                      MaterialState.disabled)) {
+                                                    if (cubit.board[i] == "x") {
+                                                      return const Color
+                                                              .fromRGBO(
+                                                          182, 82, 81, .1);
+                                                    } else {
+                                                      return const Color
+                                                              .fromRGBO(
+                                                          182, 82, 81, .5);
+                                                    }
+                                                  } else {
+                                                    if (cubit.board[i] == "x") {
+                                                      return const Color
+                                                              .fromRGBO(
+                                                          182, 82, 81, .1);
+                                                    } else {
+                                                      return const Color
+                                                              .fromRGBO(
+                                                          182, 82, 81, .9);
+                                                    }
+                                                  }
+                                                  // Use the component's default.
+                                                },
+                                              ),
+
+                                              //  primary: const Color.fromRGBO(182, 82, 81, 1),
+                                            ),
                                             onPressed: cubit.playWithFriends
                                                 ? cubit.number1() == i + 1
                                                     ? null

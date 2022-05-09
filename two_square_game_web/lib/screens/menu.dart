@@ -11,7 +11,7 @@ import '../shared/cubit/menu_controller.dart';
 import '../shared/cubit/states/menu_states.dart';
 import '../shared/util/device_screen.dart';
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:js' as js;
+//import 'dart:js' as js;
 
 import 'how_to_play.dart';
 
@@ -144,9 +144,9 @@ class _MenuState extends State<Menu> {
                                   width: 250.w,
                                   child: ElevatedButton(
                                     onPressed: () {
-                                      js.context.callMethod('open', [
+                                      /*  js.context.callMethod('open', [
                                         'https://play.google.com/store/apps/details?id=com.hardihood.two_square_game'
-                                      ]);
+                                      ]);*/
                                     },
                                     child: Text(
                                       "Multiplayer",
@@ -232,8 +232,9 @@ class _MenuState extends State<Menu> {
           style: TBIBFontStyle.h6,
         ),
         onPressed: () {
-          js.context.callMethod('open',
+          /*  js.context.callMethod('open',
               ['https://pages.flycricket.io/choose-2-squares/privacy.html']);
+              */
         },
         backgroundColor: const Color.fromRGBO(182, 82, 81, 1),
       ),

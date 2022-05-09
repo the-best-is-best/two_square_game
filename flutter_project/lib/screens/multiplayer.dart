@@ -208,11 +208,47 @@ class _MultiPlayerState extends State<MultiPlayer> with WidgetsBindingObserver {
                                           Padding(
                                             padding: const EdgeInsets.all(4.0),
                                             child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                primary: cubit.board[i] == "x"
-                                                    ? const Color.fromRGBO(
-                                                        182, 82, 81, .5)
-                                                    : null,
+                                              style: ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStateProperty
+                                                        .resolveWith<Color>(
+                                                  (Set<MaterialState> states) {
+                                                    if (states.contains(
+                                                        MaterialState
+                                                            .pressed)) {
+                                                      return const Color
+                                                              .fromRGBO(
+                                                          182, 82, 81, .6);
+                                                    } else if (states.contains(
+                                                        MaterialState
+                                                            .disabled)) {
+                                                      if (cubit.board[i] ==
+                                                          "x") {
+                                                        return const Color
+                                                                .fromRGBO(
+                                                            182, 82, 81, .1);
+                                                      } else {
+                                                        return const Color
+                                                                .fromRGBO(
+                                                            182, 82, 81, .5);
+                                                      }
+                                                    } else {
+                                                      if (cubit.board[i] ==
+                                                          "x") {
+                                                        return const Color
+                                                                .fromRGBO(
+                                                            182, 82, 81, .1);
+                                                      } else {
+                                                        return const Color
+                                                                .fromRGBO(
+                                                            182, 82, 81, .9);
+                                                      }
+                                                    }
+                                                    // Use the component's default.
+                                                  },
+                                                ),
+
+                                                //  primary: const Color.fromRGBO(182, 82, 81, 1),
                                               ),
                                               onPressed: cubit.turn() !=
                                                       cubit.player()
