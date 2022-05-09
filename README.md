@@ -1,4 +1,4 @@
-# two_square_game
+# Choose Two Squares
 
 A new Flutter project.
 
